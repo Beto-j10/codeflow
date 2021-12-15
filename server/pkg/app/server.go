@@ -31,9 +31,9 @@ func (s *Server) Run() error {
 	flag.Parse()
 
 	s.config()
-	s.Routes()
+	router := s.Routes()
 
-	err := http.ListenAndServe(":"+*port, s.router)
+	err := http.ListenAndServe(":"+*port, router)
 	if err != nil {
 		log.Printf("Error running serve: %v", err)
 		return err

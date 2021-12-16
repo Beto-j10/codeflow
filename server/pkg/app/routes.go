@@ -7,8 +7,8 @@ import (
 func (s *Server) Routes() *chi.Mux {
 	router := s.router
 	router.Route("/v1/api", func(router chi.Router) {
-		router.Post("/compiler", s.compiler())
-		router.Post("/program", s.saveProgram())
+		router.Post("/compiler", s.handler.Compiler())
+		router.Post("/program", s.handler.SaveProgram())
 	})
 	return router
 }

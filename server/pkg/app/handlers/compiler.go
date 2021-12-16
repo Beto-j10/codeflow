@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"server/pkg/app/client"
 
 	"github.com/go-chi/render"
 )
@@ -18,7 +17,7 @@ func (h *handler) Compiler() http.HandlerFunc {
 			return
 		}
 
-		dataCompiler := &client.Compiler{}
+		dataCompiler := &Compiler{}
 		err := json.NewDecoder(r.Body).Decode(&dataCompiler)
 		if err != nil {
 			log.Printf("data read error: %v", err)

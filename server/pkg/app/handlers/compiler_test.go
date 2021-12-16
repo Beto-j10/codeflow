@@ -62,6 +62,8 @@ func TestCompilerClient(t *testing.T) {
 				return
 			}
 		}
+		res, _ := json.Marshal(map[string]string{"msg": "Ok"})
+		w.Write([]byte(res))
 	}))
 	defer ts.Close()
 
@@ -73,11 +75,11 @@ func TestCompilerClient(t *testing.T) {
 
 		name: "successful request",
 		compiler: Compiler{
-			ClientIDsssss: "test 123",
-			ClientSecret:  "test 456",
-			Script:        "test script",
-			Language:      "python",
-			VersionIndex:  "test 1",
+			ClientID:     "test 123",
+			ClientSecret: "test 456",
+			Script:       "test script",
+			Language:     "python",
+			VersionIndex: "test 1",
 		},
 		want: 200,
 	}

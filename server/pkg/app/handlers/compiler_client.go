@@ -8,11 +8,11 @@ import (
 )
 
 type Compiler struct {
-	ClientIDsssss string `json:"clientId"`
-	ClientSecret  string `json:"clientSecret"`
-	Script        string `json:"script"`
-	Language      string `json:"language"`
-	VersionIndex  string `json:"versionIndex"`
+	ClientID     string `json:"clientId"`
+	ClientSecret string `json:"clientSecret"`
+	Script       string `json:"script"`
+	Language     string `json:"language"`
+	VersionIndex string `json:"versionIndex"`
 }
 
 type Response struct {

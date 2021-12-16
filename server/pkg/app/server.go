@@ -4,8 +4,9 @@ import (
 	"flag"
 	"log"
 	"net/http"
-	"server/pkg/api"
 	"time"
+
+	"server/pkg/app/handlers"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -14,13 +15,13 @@ import (
 
 type Server struct {
 	router  *chi.Mux
-	program api.ProgramService
+	handler handlers.Handler
 }
 
-func NewServer(router *chi.Mux, programService api.ProgramService) *Server {
+func NewServer(router *chi.Mux, handler handlers.Handler) *Server {
 	return &Server{
 		router:  router,
-		program: programService,
+		handler: handler,
 	}
 }
 
@@ -31,9 +32,9 @@ func (s *Server) Run() error {
 	flag.Parse()
 
 	s.config()
-	s.Routes()
+	router := s.Routes()
 
-	err := http.ListenAndServe(":"+*port, s.router)
+	err := http.ListenAndServe(":"+*port, router)
 	if err != nil {
 		log.Printf("Error running serve: %v", err)
 		return err

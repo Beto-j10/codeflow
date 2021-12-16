@@ -1,17 +1,15 @@
-package app
+package handlers
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"server/pkg/api"
 	"server/pkg/app/client"
 
 	"github.com/go-chi/render"
 )
 
-//TODO: CHECK ERRORS REQUEST //DisallowUnknownFields
-func (s *Server) compiler() http.HandlerFunc {
+func (h *handler) Compiler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		// check content-type
@@ -36,26 +34,5 @@ func (s *Server) compiler() http.HandlerFunc {
 		}
 
 		render.JSON(w, r, response.Body)
-	}
-}
-
-func (s *Server) saveProgram() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		// check content-type
-		if r.Header.Get("Content-Type") != "application/json" {
-			w.WriteHeader(http.StatusUnsupportedMediaType)
-			return
-		}
-
-		program := &api.Program{}
-		err := json.NewDecoder(r.Body).Decode(&program)
-		if err != nil {
-			log.Printf("data read error: %v", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		// TODO: check error
-		s.program.New(*program)
 	}
 }

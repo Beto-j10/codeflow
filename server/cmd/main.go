@@ -6,6 +6,7 @@ import (
 	"os"
 	_api "server/pkg/api"
 	"server/pkg/app"
+	"server/pkg/app/handlers"
 	"server/pkg/repository"
 
 	"github.com/dgraph-io/dgo/v210"
@@ -30,9 +31,10 @@ func run() error {
 		return err
 	}
 
-	router := chi.NewRouter()
 	programService := _api.NewProgramService(storage)
-	server := app.NewServer(router, programService)
+	handler := handlers.NewHandler(programService)
+	router := chi.NewRouter()
+	server := app.NewServer(router, handler)
 
 	// start server
 	err = server.Run()
@@ -47,6 +49,7 @@ func newClientDgraph() *dgo.Dgraph {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//TODO
 	// defer conn.Close()
 	return dgo.NewDgraphClient(
 		api.NewDgraphClient(conn),

@@ -1,15 +1,24 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
 )
 
-type CompilerTest struct {
+type CompilerResp struct {
+	ClientID     string `json:"clientId"`
+	ClientSecret string `json:"clientSecret"`
+	Script       string `json:"script"`
+	Language     string `json:"language"`
+	VersionIndex string `json:"versionIndex"`
+}
+type CompilerReq struct {
 	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
 	Script       string `json:"script"`
@@ -21,76 +30,123 @@ func TestCompilerClient(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		w.Header().Set("Content-Type", "application/json")
-
 		//check request method
 		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			res, _ := json.Marshal(map[string]string{"msg": "Method Not Allowed"})
-			w.Write([]byte(res))
+			http.Error(w, "Server - method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
 		// check request content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			w.WriteHeader(http.StatusUnsupportedMediaType)
-			res, _ := json.Marshal(map[string]string{"msg": "Unsupported Media Type"})
-			w.Write([]byte(res))
+			http.Error(w, "Server - Unsupported Media Type", http.StatusUnsupportedMediaType)
 			return
 		}
 
-		var c CompilerTest
+		var c CompilerResp
 
 		decoder := json.NewDecoder(r.Body)
 		decoder.DisallowUnknownFields()
 		err := decoder.Decode(&c)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			res, _ := json.Marshal(map[string]string{"msg": err.Error()})
-			w.Write([]byte(res))
+			http.Error(w, "Server - "+err.Error(), http.StatusBadRequest)
 			return
 		}
+
 		// check all data is filled in
 		// helps support the compiler data structure
 		v := reflect.ValueOf(c)
 		for i := 0; i < v.NumField(); i++ {
 			if reflect.DeepEqual(v.Field(i).Interface(), reflect.Zero(v.Field(i).Type()).Interface()) {
-				msg := fmt.Sprintf("empty field: %v", v.Type().Field(i).Tag)
-				w.WriteHeader(http.StatusBadRequest)
-				res, _ := json.Marshal(map[string]string{"msg": msg})
-				w.Write([]byte(res))
+				msg := fmt.Sprintf("Server - empty field: %v", v.Type().Field(i).Tag)
+				http.Error(w, msg, http.StatusBadRequest)
 				return
 			}
 		}
-		res, _ := json.Marshal(map[string]string{"msg": "Ok"})
-		w.Write([]byte(res))
+		http.Error(w, "Ok", http.StatusOK)
 	}))
 	defer ts.Close()
 
-	test := struct {
-		name     string
-		compiler Compiler
-		want     int
+	tests := []struct {
+		name        string
+		compiler    CompilerReq
+		contentType string
+		want        int
 	}{
-
-		name: "successful request",
-		compiler: Compiler{
-			ClientID:     "test 123",
-			ClientSecret: "test 456",
-			Script:       "test script",
-			Language:     "python",
-			VersionIndex: "test 1",
+		{
+			name: "successful request",
+			compiler: CompilerReq{
+				ClientID:     "test 123",
+				ClientSecret: "test 456",
+				Script:       "test script",
+				Language:     "python",
+				VersionIndex: "test 1",
+			},
+			contentType: "application/json",
+			want:        200,
 		},
-		want: 200,
+		{
+			name: "invalid because data is missing",
+			compiler: CompilerReq{
+				ClientID:     "test ID",
+				ClientSecret: "test Secret",
+				Script:       "test script",
+				Language:     "test Language",
+			},
+			contentType: "application/json",
+			want:        400,
+		},
+		{
+			name: "invalid due Content-Type",
+			compiler: CompilerReq{
+				ClientID:     "test ID",
+				ClientSecret: "test Secret",
+				Script:       "test script",
+				Language:     "test Language",
+				VersionIndex: "test Index",
+			},
+			contentType: "text/plain",
+			want:        415,
+		},
 	}
 
-	response, err := test.compiler.CompilerClientURL(ts.URL)
-	if err != nil {
-		t.Errorf("Expected error to be nil, got: %v", err)
+	for _, test := range tests {
+
+		t.Run(test.name, func(t *testing.T) {
+
+			dataReq, err := json.Marshal(test.compiler)
+			if err != nil {
+				t.Errorf("expected error to be nil, got %v", err)
+				return
+			}
+			req := httptest.NewRequest(http.MethodPost, "/compiler", bytes.NewBuffer(dataReq))
+			req.Header.Set("Content-Type", test.contentType)
+
+			URL = ts.URL
+			w := httptest.NewRecorder()
+			h := handler{}
+			hf := http.HandlerFunc(h.Compiler())
+			hf.ServeHTTP(w, req)
+
+			resp := w.Result()
+			defer resp.Body.Close()
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Errorf("expected error to be nil, got %v", err)
+			}
+			if resp.StatusCode != test.want {
+				t.Errorf("test: - %s - failed. got: %d, want: %d, msg: %s", test.name, resp.StatusCode, test.want, string(body))
+			}
+		})
+
 	}
 
-	if response.StatusCode != test.want {
-		t.Errorf("test: - %s - failed. got: %d, wanted: %d, msg: %s", test.name, response.StatusCode, test.want, response.Body["msg"])
-	}
+	// response, err := test.compiler.CompilerClientURL(ts.URL)
+	// if err != nil {
+	// 	t.Errorf("Expected error to be nil, got: %v", err)
+	// }
+
+	// if response.StatusCode != test.want {
+	// 	t.Errorf("test: - %s - failed. got: %d, wanted: %d, msg: %s", test.name, response.StatusCode, test.want, response.Body["msg"])
+	// }
 
 }

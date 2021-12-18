@@ -58,21 +58,23 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 		Header:     response.Header,
 	}
 
-	if response.Header.Get("Content-Type") == "application/json" {
-		var body map[string]string
-		err = json.NewDecoder(response.Body).Decode(&body)
-		if err != nil {
-			return nil, err
-		}
-		res.Body = body
-	} else {
-		//send body as text/plain
+	//send body as text/plain
+	if response.Header.Get("Content-Type") == "text/plain" {
 		bodyB, err := io.ReadAll(response.Body)
 		if err != nil {
 			return nil, err
 		}
 		body := string(bodyB)
 		res.Body = body
+		return res, nil
 	}
+
+	//send body as JSON
+	var body map[string]string
+	err = json.NewDecoder(response.Body).Decode(&body)
+	if err != nil {
+		return nil, err
+	}
+	res.Body = body
 	return res, nil
 }

@@ -12,7 +12,7 @@ func (h *handler) Compiler() http.HandlerFunc {
 
 		// check content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			w.WriteHeader(http.StatusUnsupportedMediaType)
+			wJSON(w, m{"error": http.StatusText(http.StatusUnsupportedMediaType), "statusCode": 415}, http.StatusUnsupportedMediaType)
 			return
 		}
 
@@ -20,36 +20,27 @@ func (h *handler) Compiler() http.HandlerFunc {
 		err := json.NewDecoder(r.Body).Decode(&dataCompiler)
 		if err != nil {
 			log.Printf("data read error: %v", err)
-			w.WriteHeader(http.StatusBadRequest)
+			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
 			return
 		}
 
 		response, err := dataCompiler.CompilerClient()
 		if err != nil {
 			log.Printf("Error request compiler: %v", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		//response as JSON
-		if response.Header.Get("Content-Type") == "application/json" {
-			body, err := json.Marshal(response.Body)
-			if err != nil {
-				log.Printf("Error encoding data: %v", err)
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			w.WriteHeader(response.StatusCode)
-			w.Write(body)
+			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
 			return
 		}
 
 		//reponse as text/plain
-		body := fmt.Sprintf("%v", response.Body)
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		w.WriteHeader(response.StatusCode)
-		w.Write([]byte(body))
+		if response.Header.Get("Content-Type") == "text/plain" {
+			body := fmt.Sprintf("%v", response.Body)
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			w.WriteHeader(response.StatusCode)
+			w.Write([]byte(body))
+			return
+		}
+
+		//response as JSON
+		wJSON(w, m{"compiler": response.Body}, response.StatusCode)
 	}
 }

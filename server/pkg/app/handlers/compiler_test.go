@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -32,13 +31,14 @@ func TestCompilerClient(t *testing.T) {
 
 		//check request method
 		if r.Method != http.MethodPost {
-			http.Error(w, "Server - method Not Allowed", http.StatusMethodNotAllowed)
+			wJSON(w, m{"error": http.StatusText(http.StatusMethodNotAllowed), "statusCode": 405}, http.StatusMethodNotAllowed)
+
 			return
 		}
 
 		// check request content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			http.Error(w, "Server - Unsupported Media Type", http.StatusUnsupportedMediaType)
+			wJSON(w, m{"error": http.StatusText(http.StatusUnsupportedMediaType), "statusCode": 415}, http.StatusUnsupportedMediaType)
 			return
 		}
 
@@ -48,7 +48,7 @@ func TestCompilerClient(t *testing.T) {
 		decoder.DisallowUnknownFields()
 		err := decoder.Decode(&c)
 		if err != nil {
-			http.Error(w, "Server - "+err.Error(), http.StatusBadRequest)
+			wJSON(w, m{"error": err.Error(), "statusCode": 400}, http.StatusBadRequest)
 			return
 		}
 
@@ -58,11 +58,11 @@ func TestCompilerClient(t *testing.T) {
 		for i := 0; i < v.NumField(); i++ {
 			if reflect.DeepEqual(v.Field(i).Interface(), reflect.Zero(v.Field(i).Type()).Interface()) {
 				msg := fmt.Sprintf("Server - empty field: %v", v.Type().Field(i).Tag)
-				http.Error(w, msg, http.StatusBadRequest)
+				wJSON(w, m{"error": msg, "statusCode": "400"}, http.StatusBadRequest)
 				return
 			}
 		}
-		http.Error(w, "Ok", http.StatusOK)
+		wJSON(w, m{"output": "Compiled code", "statusCode": "200", "memory": "7884", "cpuTime": "0.01"}, http.StatusOK)
 	}))
 	defer ts.Close()
 
@@ -130,12 +130,16 @@ func TestCompilerClient(t *testing.T) {
 
 			resp := w.Result()
 			defer resp.Body.Close()
-			body, err := io.ReadAll(resp.Body)
+
+			var body map[string]interface{}
+
+			json.NewDecoder(resp.Body).Decode(&body)
 			if err != nil {
 				t.Errorf("expected error to be nil, got %v", err)
 			}
+
 			if resp.StatusCode != test.want {
-				t.Errorf("test: - %s - failed. got: %d, want: %d, msg: %s", test.name, resp.StatusCode, test.want, string(body))
+				t.Errorf("test: - %s - failed. got: %d, want: %d, msg: %v", test.name, resp.StatusCode, test.want, body)
 			}
 		})
 

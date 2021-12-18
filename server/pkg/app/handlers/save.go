@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"server/pkg/api"
 )
@@ -11,7 +12,7 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 
 		// check content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			http.Error(w, "Server - Unsupported Media Type", http.StatusUnsupportedMediaType)
+			wJSON(w, m{"error": http.StatusText(http.StatusUnsupportedMediaType), "statusCode": 415}, http.StatusUnsupportedMediaType)
 			return
 		}
 
@@ -21,7 +22,8 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 		decoder.DisallowUnknownFields()
 		err := decoder.Decode(&program)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			log.Printf("Error Decode: %v", err)
+			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
 			return
 		}
 		// TODO: check error

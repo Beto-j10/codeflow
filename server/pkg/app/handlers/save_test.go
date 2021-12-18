@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"server/pkg/api"
@@ -70,14 +69,15 @@ func TestSave(t *testing.T) {
 			resp := w.Result()
 			defer resp.Body.Close()
 
-			bodyB, err := io.ReadAll(resp.Body)
+			var body map[string]interface{}
+
+			json.NewDecoder(resp.Body).Decode(&body)
 			if err != nil {
 				t.Errorf("expected error to be nil, got %v", err)
 			}
-			body := string(bodyB)
 
 			if resp.StatusCode != test.want {
-				t.Errorf("test: - %s - failed. got: %d, want: %d, msg: %s", test.name, resp.StatusCode, test.want, body)
+				t.Errorf("test: - %s - failed. got: %d, want: %d, body: %v", test.name, resp.StatusCode, test.want, body)
 			}
 		})
 

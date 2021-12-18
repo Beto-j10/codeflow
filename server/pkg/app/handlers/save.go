@@ -16,12 +16,6 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 		}
 
 		program := &api.Program{}
-		// err := json.NewDecoder(r.Body).Decode(&program)
-		// if err != nil {
-		// 	log.Printf("data read error: %v", err)
-		// 	w.WriteHeader(http.StatusBadRequest)
-		// 	return
-		// }
 
 		decoder := json.NewDecoder(r.Body)
 		decoder.DisallowUnknownFields()

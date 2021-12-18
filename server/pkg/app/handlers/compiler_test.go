@@ -91,6 +91,7 @@ func TestCompilerClient(t *testing.T) {
 				ClientSecret: "test Secret",
 				Script:       "test script",
 				Language:     "test Language",
+				VersionIndex: "",
 			},
 			contentType: "application/json",
 			want:        400,
@@ -139,14 +140,5 @@ func TestCompilerClient(t *testing.T) {
 		})
 
 	}
-
-	// response, err := test.compiler.CompilerClientURL(ts.URL)
-	// if err != nil {
-	// 	t.Errorf("Expected error to be nil, got: %v", err)
-	// }
-
-	// if response.StatusCode != test.want {
-	// 	t.Errorf("test: - %s - failed. got: %d, wanted: %d, msg: %s", test.name, response.StatusCode, test.want, response.Body["msg"])
-	// }
 
 }

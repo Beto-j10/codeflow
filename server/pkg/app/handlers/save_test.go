@@ -64,7 +64,6 @@ func TestSave(t *testing.T) {
 			req.Header.Set("Content-Type", test.contentType)
 
 			w := httptest.NewRecorder()
-			// hf := http.HandlerFunc(h.SaveProgram())
 			hf := http.HandlerFunc(mockHandler.SaveProgram())
 			hf.ServeHTTP(w, req)
 

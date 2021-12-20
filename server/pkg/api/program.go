@@ -5,13 +5,13 @@ import "errors"
 //TODO:Check pointer Program in ProgramService/New/handlers/storage
 type ProgramService interface {
 	New(program Program) error
-	// Get()
+	Get(getBy Program) ([]Program, error)
 	// GetList()
 }
 
 type ProgramRepository interface {
 	SaveProgram(Program) error
-	GetProgram(program Program) ([]Program, error)
+	GetProgram(getBy Program) ([]Program, error)
 	// GetListPrograms(program Program) error
 }
 
@@ -37,7 +37,13 @@ func (p *programService) New(program Program) error {
 	return nil
 }
 
-func (p *programService) Get(program Program) ([]Program, error) {
-	p.storage.GetProgram(program)
-	return nil, nil
+func (p *programService) Get(getBy Program) ([]Program, error) {
+	if getBy.Uid == "" {
+		return nil, errors.New("uid required")
+	}
+	response, err := p.storage.GetProgram(getBy)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
 }

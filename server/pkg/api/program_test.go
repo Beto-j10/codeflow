@@ -8,20 +8,20 @@ import (
 //TODO: study test mock
 type mockProgramRepository struct{}
 
-func (m mockProgramRepository) SaveProgram(request Program) error {
-	if request.Name == "test program name already created" {
+func (m mockProgramRepository) SaveProgram(program Program) error {
+	if program.Name == "test program name already created" {
 		return errors.New("name already exists")
 	}
 	return nil
 }
 
-func (m mockProgramRepository) GetProgram(request Program) ([]Program, error) {
-	if request.Uid == "no uid exists in db" {
+func (m mockProgramRepository) GetProgram(getBy Program) ([]Program, error) {
+	if getBy.Uid == "no uid exists in db" {
 		return nil, errors.New("not found")
 	}
 	p := GetPrograms{
 		Program: []Program{
-			Program{
+			{
 				Uid:     "uid response db",
 				Name:    "name response db",
 				Program: "program response db",
@@ -37,12 +37,12 @@ func TestSaveProgram(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		request Program
+		program Program
 		want    error
 	}{
 		{
 			name: "should save a program succesfully",
-			request: Program{
+			program: Program{
 				Name:    "test program",
 				Program: "code to compile",
 			},
@@ -50,7 +50,7 @@ func TestSaveProgram(t *testing.T) {
 		},
 		{
 			name: "should return an error because the name is missing",
-			request: Program{
+			program: Program{
 				Name:    "",
 				Program: "code to compile",
 			},
@@ -58,7 +58,7 @@ func TestSaveProgram(t *testing.T) {
 		},
 		{
 			name: "should return an error because the name already exists",
-			request: Program{
+			program: Program{
 				Name:    "test program name already created",
 				Program: "code to compile",
 			},
@@ -68,7 +68,7 @@ func TestSaveProgram(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err := mockProgramService.New(test.request)
+			err := mockProgramService.New(test.program)
 			if !errors.Is(err, test.want) && err.Error() != test.want.Error() {
 				t.Errorf("test: %s failed. got: %v, wanted: %v", test.name, err, test.want)
 			}
@@ -81,27 +81,27 @@ func TestGetProgram(t *testing.T) {
 	mockProgramService := NewProgramService(&mockDB)
 
 	tests := []struct {
-		name    string
-		request Program
-		want    error
+		name  string
+		getBy Program
+		want  error
 	}{
 		{
 			name: "run query successfully and return error nil",
-			request: Program{
+			getBy: Program{
 				Uid: "uid test",
 			},
 			want: nil,
 		},
 		{
 			name: "should return an error because Uid is missing",
-			request: Program{
+			getBy: Program{
 				Uid: "",
 			},
 			want: errors.New("uid required"),
 		},
 		{
 			name: "should return error because no resource found",
-			request: Program{
+			getBy: Program{
 				Uid: "no uid exists in db",
 			},
 			want: errors.New("not found"),
@@ -110,7 +110,7 @@ func TestGetProgram(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			response, err := mockProgramService.Get(test.request)
+			response, err := mockProgramService.Get(test.getBy)
 			if !errors.Is(err, test.want) && err.Error() != test.want.Error() {
 				t.Errorf("test: %s failed. got: %v, wanted: %v, response: %v ", test.name, err, test.want, response)
 			}

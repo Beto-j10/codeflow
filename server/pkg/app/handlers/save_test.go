@@ -14,6 +14,9 @@ type mockProgramService struct{}
 func (m *mockProgramService) New(api.Program) error {
 	return nil
 }
+func (m *mockProgramService) Get(api.Program) ([]api.Program, error) {
+	return nil, nil
+}
 
 type SaveReq struct {
 	Name    string `json:"name,omitempty"`

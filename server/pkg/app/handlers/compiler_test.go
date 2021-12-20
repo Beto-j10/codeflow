@@ -128,18 +128,18 @@ func TestCompilerClient(t *testing.T) {
 			hf := http.HandlerFunc(h.Compiler())
 			hf.ServeHTTP(w, req)
 
-			resp := w.Result()
-			defer resp.Body.Close()
+			response := w.Result()
+			defer response.Body.Close()
 
 			var body map[string]interface{}
 
-			json.NewDecoder(resp.Body).Decode(&body)
+			json.NewDecoder(response.Body).Decode(&body)
 			if err != nil {
 				t.Errorf("expected error to be nil, got %v", err)
 			}
 
-			if resp.StatusCode != test.want {
-				t.Errorf("test: - %s - failed. got: %d, want: %d, msg: %v", test.name, resp.StatusCode, test.want, body)
+			if response.StatusCode != test.want {
+				t.Errorf("test: - %s - failed. got: %d, want: %d, msg: %v", test.name, response.StatusCode, test.want, body)
 			}
 		})
 

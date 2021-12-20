@@ -4,14 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	_api "server/pkg/api"
-	"server/pkg/app"
-	"server/pkg/app/handlers"
+	a "server/pkg/api"
 	"server/pkg/repository"
 
 	"github.com/dgraph-io/dgo/v210"
 	"github.com/dgraph-io/dgo/v210/protos/api"
-	"github.com/go-chi/chi/v5"
 	"google.golang.org/grpc"
 )
 
@@ -30,17 +27,28 @@ func run() error {
 	if err != nil {
 		return err
 	}
-
-	programService := _api.NewProgramService(storage)
-	handler := handlers.NewHandler(programService)
-	router := chi.NewRouter()
-	server := app.NewServer(router, handler)
-
-	// start server
-	err = server.Run()
-	if err != nil {
-		return err
+	//TODO: delete
+	p := a.Program{
+		Name:    "Progra11",
+		Program: `{"node": {"pp": "tres"}}`,
+		// DType:   []string{"Program"},
 	}
+	err = storage.SaveProgram(p)
+	if err != nil {
+		log.Println("Errorrrrr:", err)
+	}
+
+	//TODO: uncomment
+	// programService := a.NewProgramService(storage)
+	// handler := handlers.NewHandler(programService)
+	// router := chi.NewRouter()
+	// server := app.NewServer(router, handler)
+
+	// // start server
+	// err = server.Run()
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -49,8 +57,7 @@ func newClientDgraph() *dgo.Dgraph {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//TODO
-	// defer conn.Close()
+
 	return dgo.NewDgraphClient(
 		api.NewDgraphClient(conn),
 	)

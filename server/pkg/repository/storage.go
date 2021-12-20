@@ -3,20 +3,20 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/dgraph-io/dgo/v210"
 	"github.com/dgraph-io/dgo/v210/protos/api"
 
-	_api "server/pkg/api"
+	a "server/pkg/api"
 )
 
 type Storage interface {
 	SetupRepository() error
-	SaveProgram(program _api.Program) error
-	// GetProgram(program _api.Program) error
-	// GetListPrograms(program _api.Program) error
+	SaveProgram(program a.Program) error
+	GetProgram(program a.Program) ([]a.Program, error)
+	GetProgramList() ([]a.ProgramList, error)
 }
 
 //TODO check variables name // check log.Fatal
@@ -32,7 +32,7 @@ func NewStorage(dgraphClient *dgo.Dgraph) Storage {
 
 func (s *storage) SetupRepository() error {
 	op := &api.Operation{}
-	op.Schema = _api.Schema
+	op.Schema = a.Schema
 	op.RunInBackground = true
 	err := s.dgraphClient.Alter(context.Background(), op)
 	if err != nil {
@@ -41,46 +41,60 @@ func (s *storage) SetupRepository() error {
 	return nil
 }
 
-//TODO: add upsert name to the names already exist
-func (s *storage) SaveProgram(program _api.Program) error {
+func (s *storage) SaveProgram(program a.Program) error {
 	ctx := context.Background()
 	txn := s.dgraphClient.NewTxn()
 	defer txn.Discard(ctx)
 
-	p := _api.Program{
-		// Uid:     "_:program1",
-		Name:    "Program1",
-		Program: `{"node": {"pp": "tres"}}`,
-	}
-
-	pb, err := json.Marshal(p)
+	program.Uid = "_:program"
+	pb, err := json.Marshal(program)
 	if err != nil {
 		return err
 	}
+	//TODO: uncommentQuery
+	query := `
+		query{
+			prog as var(func: eq(name, "d"))
+		}`
+	// query := `
+	// 	query P($name: string){
+	// 		prog as var(func: eq(name, $name))
+	// 	}`
 
 	mu := &api.Mutation{
+		Cond:    `@if(eq(len(prog), 0))`,
 		SetJson: pb,
 	}
 
 	req := &api.Request{
+		Query: query,
+		//TODO: uncomment vars
+		// Vars:      map[string]string{"$name": program.Name},
 		Mutations: []*api.Mutation{mu},
 		CommitNow: true,
 	}
 
-	resp, err := txn.Do(ctx, req)
+	response, err := txn.Do(ctx, req)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("RESP: ", resp)
+	fmt.Printf("\nRESP: %v\n", response)
+
+	if len(response.Uids) == 0 {
+		return errors.New("name already exists")
+	}
+	s.GetProgram(program)
+	s.GetProgramList()
 	return nil
 }
 
-func (s *storage) GetPrograms() {
+func (s *storage) GetProgram(program a.Program) ([]a.Program, error) {
 	ctx := context.Background()
-	const query = `query programs($a: string)
+	//TODO: change uid to var
+	const query = `query Program($uid: string)
 		{
-			programs(func: anyoftext(name, $a)) {
+			program(func: uid("0x1")) {
 				uid
 				name
 				program
@@ -89,25 +103,54 @@ func (s *storage) GetPrograms() {
 	`
 	txn := s.dgraphClient.NewReadOnlyTxn()
 	defer txn.Discard(ctx)
+
 	req := &api.Request{
 		Query: query,
-		Vars:  map[string]string{"$a": "programa"},
+		Vars:  map[string]string{"$uid": program.Uid},
 	}
-	resp, err := txn.Do(ctx, req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// fmt.Printf("%s\n", resp)
-	var Decode struct {
-		Programs []struct {
-			Uid     string
-			Name    string
-			Program string
-		}
-	}
-	if err := json.Unmarshal(resp.GetJson(), &Decode); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s\n", Decode)
 
+	response, err := txn.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &a.GetPrograms{}
+	err = json.Unmarshal(response.Json, &res)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("\nGETTTTTTTTTTTTT: %+v\n", res.Program)
+	return res.Program, nil
+}
+
+func (s *storage) GetProgramList() ([]a.ProgramList, error) {
+
+	ctx := context.Background()
+	const query = `query
+		{
+			programList(func: has(name)) {
+				uid
+				name
+			}
+		}
+	`
+	txn := s.dgraphClient.NewReadOnlyTxn()
+	defer txn.Discard(ctx)
+
+	req := &api.Request{
+		Query: query,
+	}
+
+	response, err := txn.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &a.GetPrograms{}
+	err = json.Unmarshal(response.Json, &res)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("\nLISSSSSSSSSTTTTT: %+v\n", res.List)
+	return res.List, nil
 }

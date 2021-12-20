@@ -11,7 +11,7 @@ type ProgramService interface {
 
 type ProgramRepository interface {
 	SaveProgram(Program) error
-	// GetProgram(program Program) error
+	GetProgram(program Program) ([]Program, error)
 	// GetListPrograms(program Program) error
 }
 
@@ -28,11 +28,16 @@ func NewProgramService(programRepository ProgramRepository) ProgramService {
 //TODO: add normalization an validations
 func (p *programService) New(program Program) error {
 	if program.Name == "" {
-		return errors.New("Program service - name required")
+		return errors.New("name required")
 	}
 	err := p.storage.SaveProgram(program)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (p *programService) Get(program Program) ([]Program, error) {
+	p.storage.GetProgram(program)
+	return nil, nil
 }

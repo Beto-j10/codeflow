@@ -10,9 +10,25 @@ type mockProgramRepository struct{}
 
 func (m mockProgramRepository) SaveProgram(request Program) error {
 	if request.Name == "test program name already created" {
-		return errors.New("DB - name already exists")
+		return errors.New("name already exists")
 	}
 	return nil
+}
+
+func (m mockProgramRepository) GetProgram(request Program) ([]Program, error) {
+	if request.Uid == "no uid exists in db" {
+		return nil, errors.New("not found")
+	}
+	p := GetPrograms{
+		Program: []Program{
+			Program{
+				Uid:     "uid response db",
+				Name:    "name response db",
+				Program: "program response db",
+			},
+		},
+	}
+	return p.Program, nil
 }
 
 func TestSaveProgram(t *testing.T) {
@@ -38,7 +54,7 @@ func TestSaveProgram(t *testing.T) {
 				Name:    "",
 				Program: "code to compile",
 			},
-			want: errors.New("Program service - name required"),
+			want: errors.New("name required"),
 		},
 		{
 			name: "should return an error because the name already exists",
@@ -46,7 +62,7 @@ func TestSaveProgram(t *testing.T) {
 				Name:    "test program name already created",
 				Program: "code to compile",
 			},
-			want: errors.New("DB - name already exists"),
+			want: errors.New("name already exists"),
 		},
 	}
 
@@ -54,8 +70,51 @@ func TestSaveProgram(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			err := mockProgramService.New(test.request)
 			if !errors.Is(err, test.want) && err.Error() != test.want.Error() {
-				t.Errorf("test: %v failed. got: %v, wanted: %v", test.name, err, test.want)
+				t.Errorf("test: %s failed. got: %v, wanted: %v", test.name, err, test.want)
 			}
 		})
 	}
+}
+
+func TestGetProgram(t *testing.T) {
+	mockDB := mockProgramRepository{}
+	mockProgramService := NewProgramService(&mockDB)
+
+	tests := []struct {
+		name    string
+		request Program
+		want    error
+	}{
+		{
+			name: "run query successfully and return error nil",
+			request: Program{
+				Uid: "uid test",
+			},
+			want: nil,
+		},
+		{
+			name: "should return an error because Uid is missing",
+			request: Program{
+				Uid: "",
+			},
+			want: errors.New("uid required"),
+		},
+		{
+			name: "should return error because no resource found",
+			request: Program{
+				Uid: "no uid exists in db",
+			},
+			want: errors.New("not found"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			response, err := mockProgramService.Get(test.request)
+			if !errors.Is(err, test.want) && err.Error() != test.want.Error() {
+				t.Errorf("test: %s failed. got: %v, wanted: %v, response: %v ", test.name, err, test.want, response)
+			}
+		})
+	}
+
 }

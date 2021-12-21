@@ -6,13 +6,13 @@ import "errors"
 type ProgramService interface {
 	New(program Program) error
 	Get(getBy Program) ([]Program, error)
-	// GetList()
+	GetList() ([]ProgramList, error)
 }
 
 type ProgramRepository interface {
 	SaveProgram(Program) error
 	GetProgram(getBy Program) ([]Program, error)
-	// GetListPrograms(program Program) error
+	GetProgramList() ([]ProgramList, error)
 }
 
 type programService struct {
@@ -25,7 +25,6 @@ func NewProgramService(programRepository ProgramRepository) ProgramService {
 	}
 }
 
-//TODO: add normalization an validations
 func (p *programService) New(program Program) error {
 	if program.Name == "" {
 		return errors.New("name required")
@@ -42,6 +41,14 @@ func (p *programService) Get(getBy Program) ([]Program, error) {
 		return nil, errors.New("uid required")
 	}
 	response, err := p.storage.GetProgram(getBy)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
+func (p *programService) GetList() ([]ProgramList, error) {
+	response, err := p.storage.GetProgramList()
 	if err != nil {
 		return nil, err
 	}

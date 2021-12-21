@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-//TODO: study test mock
 type mockProgramRepository struct{}
 
 func (m mockProgramRepository) SaveProgram(program Program) error {
@@ -29,6 +28,22 @@ func (m mockProgramRepository) GetProgram(getBy Program) ([]Program, error) {
 		},
 	}
 	return p.Program, nil
+}
+
+func (m mockProgramRepository) GetProgramList() ([]ProgramList, error) {
+	p := GetPrograms{
+		List: []ProgramList{
+			{
+				Uid:  "uid1 response db",
+				Name: "name1 response db",
+			},
+			{
+				Uid:  "uid2 response db",
+				Name: "name2 response db",
+			},
+		},
+	}
+	return p.List, nil
 }
 
 func TestSaveProgram(t *testing.T) {
@@ -110,11 +125,21 @@ func TestGetProgram(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			response, err := mockProgramService.Get(test.getBy)
+			_, err := mockProgramService.Get(test.getBy)
 			if !errors.Is(err, test.want) && err.Error() != test.want.Error() {
-				t.Errorf("test: %s failed. got: %v, wanted: %v, response: %v ", test.name, err, test.want, response)
+				t.Errorf("test: %s failed. got: %v, wanted: %v", test.name, err, test.want)
 			}
 		})
 	}
 
+}
+
+func TestGetProgramList(t *testing.T) {
+	mockDB := mockProgramRepository{}
+	mockProgramService := NewProgramService(&mockDB)
+
+	_, err := mockProgramService.GetList()
+	if err != nil {
+		t.Errorf("got: %v, want: nil ", err)
+	}
 }

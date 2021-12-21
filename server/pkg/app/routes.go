@@ -9,6 +9,8 @@ func (s *Server) Routes() *chi.Mux {
 	router.Route("/v1/api", func(router chi.Router) {
 		router.Post("/compiler", s.handler.Compiler())
 		router.Post("/program", s.handler.SaveProgram())
+		router.Get("/program", s.handler.GetProgram())
+		router.Get("/list", s.handler.GetProgramList())
 	})
 	return router
 }

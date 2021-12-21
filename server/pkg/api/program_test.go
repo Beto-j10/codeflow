@@ -14,8 +14,8 @@ func (m mockProgramRepository) SaveProgram(program Program) error {
 	return nil
 }
 
-func (m mockProgramRepository) GetProgram(getBy Program) ([]Program, error) {
-	if getBy.Uid == "no uid exists in db" {
+func (m mockProgramRepository) GetProgram(getBy string) ([]Program, error) {
+	if getBy == "no uid exists in db" {
 		return nil, errors.New("not found")
 	}
 	p := GetPrograms{
@@ -97,29 +97,23 @@ func TestGetProgram(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		getBy Program
+		getBy string
 		want  error
 	}{
 		{
-			name: "run query successfully and return error nil",
-			getBy: Program{
-				Uid: "uid test",
-			},
-			want: nil,
+			name:  "run query successfully and return error nil",
+			getBy: "uid test",
+			want:  nil,
 		},
 		{
-			name: "should return an error because Uid is missing",
-			getBy: Program{
-				Uid: "",
-			},
-			want: errors.New("uid required"),
+			name:  "should return an error because Uid is missing",
+			getBy: "",
+			want:  errors.New("uid required"),
 		},
 		{
-			name: "should return error because no resource found",
-			getBy: Program{
-				Uid: "no uid exists in db",
-			},
-			want: errors.New("not found"),
+			name:  "should return error because no resource found",
+			getBy: "no uid exists in db",
+			want:  errors.New("not found"),
 		},
 	}
 

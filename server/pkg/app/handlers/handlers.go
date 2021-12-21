@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"server/pkg/api"
@@ -54,6 +55,13 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 			return
 		}
 
+		// check there is no query in path
+		urlValues := r.URL.Query()
+		if len(urlValues) > 0 {
+			wJSON(w, m{"error": "No query string allowed in URL", "statusCode": 400}, http.StatusBadRequest)
+			return
+		}
+
 		program := &api.Program{}
 
 		decoder := json.NewDecoder(r.Body)
@@ -64,14 +72,49 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
 			return
 		}
-		// TODO: check error
-		h.program.New(*program)
+
+		err = h.program.New(*program)
+		if err != nil {
+			if err.Error() == "name already exists" {
+				wJSON(w, m{program.Name: "Already exists", "statusCode": 409}, http.StatusConflict)
+				return
+			}
+			log.Printf("Error save program: %v", err)
+			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			return
+		}
+
+		wJSON(w, m{program.Name: "Created", "statusCode": 201}, http.StatusCreated)
 	}
 }
 
 func (h *handler) GetProgram() http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
 
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		urlValues := r.URL.Query()
+		uid := urlValues.Get("uid")
+
+		//check valid query
+		if len(urlValues) == 1 && uid != "" {
+			response, err := h.program.Get(uid)
+			if err != nil {
+				log.Printf("error get program: %v", err)
+				wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+				return
+			}
+
+			if response[0].Name == "" {
+				wJSON(w, m{uid: "Not Found", "statusCode": 404}, http.StatusNotFound)
+				return
+			}
+			wJSON(w, m{"program": response[0]}, http.StatusOK)
+			//TODO: delete print
+			fmt.Printf("#####%v\n", urlValues)
+			return
+		}
+
+		wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
 	}
 }
 

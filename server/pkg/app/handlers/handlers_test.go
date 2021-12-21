@@ -14,22 +14,22 @@ type mockProgramService struct{}
 func (m *mockProgramService) New(api.Program) error {
 	return nil
 }
-func (m *mockProgramService) Get(api.Program) ([]api.Program, error) {
+func (m *mockProgramService) Get(string) ([]api.Program, error) {
 	return nil, nil
 }
 func (m *mockProgramService) GetList() ([]api.ProgramList, error) {
 	return nil, nil
 }
 
-type SaveReq struct {
-	Name    string `json:"name,omitempty"`
-	Program string `json:"program,omitempty"`
-}
-
 func TestSave(t *testing.T) {
 
 	mockProgram := mockProgramService{}
 	mockHandler := NewHandler(&mockProgram)
+
+	type SaveReq struct {
+		Name    string `json:"name"`
+		Program string `json:"program"`
+	}
 
 	tests := []struct {
 		name        string
@@ -89,4 +89,53 @@ func TestSave(t *testing.T) {
 
 	}
 
+}
+
+func TestGet(t *testing.T) {
+	mockProgram := mockProgramService{}
+	mockHandler := NewHandler(&mockProgram)
+
+	tests := []struct {
+		name string
+		path string
+		want int
+	}{
+		{
+			name: "return a program succesfully",
+			path: `/compiler?uid=2&yy=4`,
+			want: 200,
+		},
+		{
+			name: "error due to resource not found",
+			path: "/compiler?uid=0x1",
+			want: 404,
+		},
+		{
+			name: "error due to bad request",
+			path: "/compiler?ui=uid1",
+			want: 400,
+		},
+		{
+			name: "error due to bad request",
+			path: "/compiler?",
+			want: 400,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, test.path, nil)
+			req.Header.Set("Accept", "application/json")
+
+			w := httptest.NewRecorder()
+			// h := handler{}
+			// hf := http.HandlerFunc(h.GetProgram())
+			hf := http.HandlerFunc(mockHandler.GetProgram())
+			hf.ServeHTTP(w, req)
+
+			// response := w.Result()
+			// defer response.Body.Close()
+			// t.Fatal("kkkkk")
+		})
+	}
 }

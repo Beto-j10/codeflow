@@ -15,7 +15,7 @@ import (
 type Storage interface {
 	SetupRepository() error
 	SaveProgram(program a.Program) error
-	GetProgram(program a.Program) ([]a.Program, error)
+	GetProgram(getBy string) ([]a.Program, error)
 	GetProgramList() ([]a.ProgramList, error)
 }
 
@@ -78,23 +78,31 @@ func (s *storage) SaveProgram(program a.Program) error {
 	if err != nil {
 		return err
 	}
-
+	//TODO: delete print
 	fmt.Printf("\nRESP: %v\n", response)
 
 	if len(response.Uids) == 0 {
 		return errors.New("name already exists")
 	}
-	s.GetProgram(program)
+
+	//TODO: delete
+	responser, err := s.GetProgram("0x77")
+	if err != nil {
+		fmt.Println("EROOOOORRRRR:", err)
+	}
+	if responser[0].Name == "" {
+		fmt.Printf("\n####ResponseGet: %+v\n", responser[0].Uid)
+
+	}
 	s.GetProgramList()
 	return nil
 }
 
-func (s *storage) GetProgram(program a.Program) ([]a.Program, error) {
+func (s *storage) GetProgram(getBy string) ([]a.Program, error) {
 	ctx := context.Background()
-	//TODO: change uid to var
 	const query = `query Program($uid: string)
 		{
-			program(func: uid("0x1")) {
+			program(func: uid($uid)) {
 				uid
 				name
 				program
@@ -106,7 +114,7 @@ func (s *storage) GetProgram(program a.Program) ([]a.Program, error) {
 
 	req := &api.Request{
 		Query: query,
-		Vars:  map[string]string{"$uid": program.Uid},
+		Vars:  map[string]string{"$uid": getBy},
 	}
 
 	response, err := txn.Do(ctx, req)
@@ -119,7 +127,8 @@ func (s *storage) GetProgram(program a.Program) ([]a.Program, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("\nGETTTTTTTTTTTTT: %+v\n", res.Program)
+	//TODO: delete print
+	fmt.Printf("\n####Get: %+v\n", res.Program)
 	return res.Program, nil
 }
 
@@ -151,6 +160,7 @@ func (s *storage) GetProgramList() ([]a.ProgramList, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("\nLISSSSSSSSSTTTTT: %+v\n", res.List)
+	//TODO: delete print
+	fmt.Printf("\n####List: %+v\n", res.List)
 	return res.List, nil
 }

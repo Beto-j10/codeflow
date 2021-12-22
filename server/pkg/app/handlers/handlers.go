@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"server/pkg/api"
@@ -58,7 +57,7 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 		// check there is no query in path
 		urlValues := r.URL.Query()
 		if len(urlValues) > 0 {
-			wJSON(w, m{"error": "No query string allowed in URL", "statusCode": 400}, http.StatusBadRequest)
+			wJSON(w, m{"error": "No query allowed in URL", "statusCode": 400}, http.StatusBadRequest)
 			return
 		}
 
@@ -66,6 +65,7 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 
 		decoder := json.NewDecoder(r.Body)
 		decoder.DisallowUnknownFields()
+
 		err := decoder.Decode(&program)
 		if err != nil {
 			log.Printf("Error Decode: %v", err)
@@ -73,10 +73,14 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 			return
 		}
 
-		err = h.program.New(*program)
+		response, err := h.program.New(*program)
 		if err != nil {
 			if err.Error() == "name already exists" {
-				wJSON(w, m{program.Name: "Already exists", "statusCode": 409}, http.StatusConflict)
+				wJSON(w, m{"error": err.Error(), "statusCode": 409}, http.StatusConflict)
+				return
+			}
+			if err.Error() == "name required" || err.Error() == "program required" {
+				wJSON(w, m{"error": err.Error(), "statusCode": 400}, http.StatusBadRequest)
 				return
 			}
 			log.Printf("Error save program: %v", err)
@@ -84,7 +88,7 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 			return
 		}
 
-		wJSON(w, m{program.Name: "Created", "statusCode": 201}, http.StatusCreated)
+		wJSON(w, m{program.Name: "Created", "uid": response, "statusCode": 201}, http.StatusCreated)
 	}
 }
 
@@ -109,8 +113,6 @@ func (h *handler) GetProgram() http.HandlerFunc {
 				return
 			}
 			wJSON(w, m{"program": response[0]}, http.StatusOK)
-			//TODO: delete print
-			fmt.Printf("#####%v\n", urlValues)
 			return
 		}
 

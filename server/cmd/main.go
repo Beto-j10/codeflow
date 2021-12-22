@@ -33,9 +33,9 @@ func run() error {
 		Program: `{"node": {"pp": "tres"}}`,
 		// DType:   []string{"Program"},
 	}
-	err = storage.SaveProgram(p)
+	_, err = storage.SaveProgram(p)
 	if err != nil {
-		log.Println("Errorrrrr:", err)
+		log.Println("Error main:", err)
 	}
 
 	//TODO: uncomment

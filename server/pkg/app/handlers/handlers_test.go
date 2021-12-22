@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"server/pkg/api"
@@ -11,17 +12,49 @@ import (
 
 type mockProgramService struct{}
 
-func (m *mockProgramService) New(api.Program) error {
-	return nil
+func (m *mockProgramService) New(program api.Program) (string, error) {
+
+	if program.Name == "" {
+		return "", errors.New("name required")
+	}
+	if program.Program == "" {
+		return "", errors.New("program required")
+	}
+
+	// mock name already exists
+	if program.Name == "test program name already created" {
+		return "", errors.New("name already exists")
+	}
+
+	// mock successfully saved and return uid
+	return "uid test", nil
 }
-func (m *mockProgramService) Get(string) ([]api.Program, error) {
-	return nil, nil
+func (m *mockProgramService) Get(getBy string) ([]api.Program, error) {
+
+	//mock resource found successfully
+	p := api.GetPrograms{
+		Program: []api.Program{
+			{
+				Uid:     "uid response db",
+				Name:    "name response db",
+				Program: "program response db",
+			},
+		},
+	}
+
+	// mock resource not found
+	if getBy == "0xb" {
+		p.Program[0].Name = ""
+		return p.Program, nil
+	}
+
+	return p.Program, nil
 }
 func (m *mockProgramService) GetList() ([]api.ProgramList, error) {
 	return nil, nil
 }
 
-func TestSave(t *testing.T) {
+func TestSaveProgram(t *testing.T) {
 
 	mockProgram := mockProgramService{}
 	mockHandler := NewHandler(&mockProgram)
@@ -34,6 +67,7 @@ func TestSave(t *testing.T) {
 	tests := []struct {
 		name        string
 		save        SaveReq
+		path        string
 		contentType string
 		want        int
 	}{
@@ -43,17 +77,59 @@ func TestSave(t *testing.T) {
 				Name:    "name test",
 				Program: "program test",
 			},
+			path:        `/program`,
 			contentType: "application/json",
-			want:        200,
+			want:        201,
 		},
 		{
-			name: "invalid due Content-Type",
+			name: "Error due Content-Type",
 			save: SaveReq{
 				Name:    "name test",
 				Program: "program test",
 			},
+			path:        `/program`,
 			contentType: "text/plain",
 			want:        415,
+		},
+		{
+			name: "Error due to query in url ",
+			save: SaveReq{
+				Name:    "name test",
+				Program: "program test",
+			},
+			path:        `/program?uid=123`,
+			contentType: "application/json",
+			want:        400,
+		},
+		{
+			name: "Error because the name already exists",
+			save: SaveReq{
+				Name:    "test program name already created",
+				Program: "program test",
+			},
+			path:        `/program`,
+			contentType: "application/json",
+			want:        409,
+		},
+		{
+			name: "Error because the name is missing",
+			save: SaveReq{
+				Name:    "",
+				Program: "program test",
+			},
+			path:        `/program`,
+			contentType: "application/json",
+			want:        400,
+		},
+		{
+			name: "Error because the program is missing",
+			save: SaveReq{
+				Name:    "program test",
+				Program: "",
+			},
+			path:        `/program`,
+			contentType: "application/json",
+			want:        400,
 		},
 	}
 	for _, test := range tests {
@@ -65,7 +141,7 @@ func TestSave(t *testing.T) {
 				t.Errorf("expected error to be nil, got %v", err)
 				return
 			}
-			req := httptest.NewRequest(http.MethodPost, ("/save"), bytes.NewBuffer(dataReq))
+			req := httptest.NewRequest(http.MethodPost, (test.path), bytes.NewBuffer(dataReq))
 			req.Header.Set("Content-Type", test.contentType)
 
 			w := httptest.NewRecorder()
@@ -77,7 +153,7 @@ func TestSave(t *testing.T) {
 
 			var body map[string]interface{}
 
-			json.NewDecoder(response.Body).Decode(&body)
+			err = json.NewDecoder(response.Body).Decode(&body)
 			if err != nil {
 				t.Errorf("expected error to be nil, got %v", err)
 			}
@@ -91,7 +167,7 @@ func TestSave(t *testing.T) {
 
 }
 
-func TestGet(t *testing.T) {
+func TestGetProgram(t *testing.T) {
 	mockProgram := mockProgramService{}
 	mockHandler := NewHandler(&mockProgram)
 
@@ -102,22 +178,22 @@ func TestGet(t *testing.T) {
 	}{
 		{
 			name: "return a program succesfully",
-			path: `/compiler?uid=2&yy=4`,
+			path: `/program?uid=0x1`,
 			want: 200,
 		},
 		{
 			name: "error due to resource not found",
-			path: "/compiler?uid=0x1",
+			path: "/program?uid=0xb",
 			want: 404,
 		},
 		{
-			name: "error due to bad request",
-			path: "/compiler?ui=uid1",
+			name: "error due to bad request, bad query in url",
+			path: "/program?ui=0x1",
 			want: 400,
 		},
 		{
-			name: "error due to bad request",
-			path: "/compiler?",
+			name: "error due to bad request, good query key but value is missing",
+			path: "/program?uid=",
 			want: 400,
 		},
 	}
@@ -128,14 +204,27 @@ func TestGet(t *testing.T) {
 			req.Header.Set("Accept", "application/json")
 
 			w := httptest.NewRecorder()
+			//TODO: delete
 			// h := handler{}
 			// hf := http.HandlerFunc(h.GetProgram())
 			hf := http.HandlerFunc(mockHandler.GetProgram())
 			hf.ServeHTTP(w, req)
 
-			// response := w.Result()
-			// defer response.Body.Close()
-			// t.Fatal("kkkkk")
+			response := w.Result()
+			defer response.Body.Close()
+
+			var body map[string]interface{}
+
+			err := json.NewDecoder(response.Body).Decode(&body)
+			if err != nil {
+				t.Errorf("expected error to be nil, got %v", err)
+			}
+
+			if response.StatusCode != test.want {
+				t.Errorf("test: - %s - failed. got: %d, want: %d, body: %v", test.name, response.StatusCode, test.want, body)
+
+			}
 		})
+
 	}
 }

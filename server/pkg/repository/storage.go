@@ -14,7 +14,7 @@ import (
 
 type Storage interface {
 	SetupRepository() error
-	SaveProgram(program a.Program) error
+	SaveProgram(program a.Program) (string, error)
 	GetProgram(getBy string) ([]a.Program, error)
 	GetProgramList() ([]a.ProgramList, error)
 }
@@ -41,15 +41,17 @@ func (s *storage) SetupRepository() error {
 	return nil
 }
 
-func (s *storage) SaveProgram(program a.Program) error {
+func (s *storage) SaveProgram(program a.Program) (string, error) {
 	ctx := context.Background()
 	txn := s.dgraphClient.NewTxn()
 	defer txn.Discard(ctx)
 
+	// will be the Key returned if the mutation is successful
 	program.Uid = "_:program"
+
 	pb, err := json.Marshal(program)
 	if err != nil {
-		return err
+		return "", err
 	}
 	//TODO: uncommentQuery
 	query := `
@@ -76,26 +78,29 @@ func (s *storage) SaveProgram(program a.Program) error {
 
 	response, err := txn.Do(ctx, req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	//TODO: delete print
-	fmt.Printf("\nRESP: %v\n", response)
+	fmt.Printf("\nRESP: %v\n", response.Uids)
 
 	if len(response.Uids) == 0 {
-		return errors.New("name already exists")
+		return "", errors.New("name already exists")
 	}
 
 	//TODO: delete
 	responser, err := s.GetProgram("0x77")
 	if err != nil {
-		fmt.Println("EROOOOORRRRR:", err)
+		fmt.Println("Error:", err)
 	}
 	if responser[0].Name == "" {
 		fmt.Printf("\n####ResponseGet: %+v\n", responser[0].Uid)
 
 	}
 	s.GetProgramList()
-	return nil
+
+	uid := response.Uids["program"]
+
+	return uid, nil
 }
 
 func (s *storage) GetProgram(getBy string) ([]a.Program, error) {

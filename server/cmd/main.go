@@ -5,10 +5,13 @@ import (
 	"log"
 	"os"
 	a "server/pkg/api"
+	"server/pkg/app"
+	"server/pkg/app/handlers"
 	"server/pkg/repository"
 
 	"github.com/dgraph-io/dgo/v210"
 	"github.com/dgraph-io/dgo/v210/protos/api"
+	"github.com/go-chi/chi/v5"
 	"google.golang.org/grpc"
 )
 
@@ -27,28 +30,17 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	//TODO: delete
-	p := a.Program{
-		Name:    "Progra11",
-		Program: `{"node": {"pp": "tres"}}`,
-		// DType:   []string{"Program"},
-	}
-	_, err = storage.SaveProgram(p)
+
+	programService := a.NewProgramService(storage)
+	handler := handlers.NewHandler(programService)
+	router := chi.NewRouter()
+	server := app.NewServer(router, handler)
+
+	// start server
+	err = server.Run()
 	if err != nil {
-		log.Println("Error main:", err)
+		return err
 	}
-
-	//TODO: uncomment
-	// programService := a.NewProgramService(storage)
-	// handler := handlers.NewHandler(programService)
-	// router := chi.NewRouter()
-	// server := app.NewServer(router, handler)
-
-	// // start server
-	// err = server.Run()
-	// if err != nil {
-	// 	return err
-	// }
 	return nil
 }
 

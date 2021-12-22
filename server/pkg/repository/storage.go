@@ -53,15 +53,11 @@ func (s *storage) SaveProgram(program a.Program) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//TODO: uncommentQuery
+
 	query := `
-		query{
-			prog as var(func: eq(name, "d"))
+		query P($name: string){
+			prog as var(func: eq(name, $name))
 		}`
-	// query := `
-	// 	query P($name: string){
-	// 		prog as var(func: eq(name, $name))
-	// 	}`
 
 	mu := &api.Mutation{
 		Cond:    `@if(eq(len(prog), 0))`,
@@ -69,9 +65,8 @@ func (s *storage) SaveProgram(program a.Program) (string, error) {
 	}
 
 	req := &api.Request{
-		Query: query,
-		//TODO: uncomment vars
-		// Vars:      map[string]string{"$name": program.Name},
+		Query:     query,
+		Vars:      map[string]string{"$name": program.Name},
 		Mutations: []*api.Mutation{mu},
 		CommitNow: true,
 	}
@@ -80,23 +75,10 @@ func (s *storage) SaveProgram(program a.Program) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	//TODO: delete print
-	fmt.Printf("\nRESP: %v\n", response.Uids)
 
 	if len(response.Uids) == 0 {
 		return "", errors.New("name already exists")
 	}
-
-	//TODO: delete
-	responser, err := s.GetProgram("0x77")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	if responser[0].Name == "" {
-		fmt.Printf("\n####ResponseGet: %+v\n", responser[0].Uid)
-
-	}
-	s.GetProgramList()
 
 	uid := response.Uids["program"]
 
@@ -124,6 +106,7 @@ func (s *storage) GetProgram(getBy string) ([]a.Program, error) {
 
 	response, err := txn.Do(ctx, req)
 	if err != nil {
+		fmt.Printf("\n#####%v\n", err)
 		return nil, err
 	}
 
@@ -132,8 +115,6 @@ func (s *storage) GetProgram(getBy string) ([]a.Program, error) {
 	if err != nil {
 		return nil, err
 	}
-	//TODO: delete print
-	fmt.Printf("\n####Get: %+v\n", res.Program)
 	return res.Program, nil
 }
 
@@ -165,7 +146,6 @@ func (s *storage) GetProgramList() ([]a.ProgramList, error) {
 	if err != nil {
 		return nil, err
 	}
-	//TODO: delete print
-	fmt.Printf("\n####List: %+v\n", res.List)
+
 	return res.List, nil
 }

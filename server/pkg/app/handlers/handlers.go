@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"server/pkg/api"
+	"strconv"
+	"strings"
 )
 
 // m type builds a map structure quickly to send a Responder
@@ -42,8 +44,6 @@ func NewHandler(programService api.ProgramService) Handler {
 		program: programService,
 	}
 }
-
-//TODO: CHECK ERRORS REQUEST //DisallowUnknownFields
 
 func (h *handler) SaveProgram() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +88,7 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 			return
 		}
 
-		wJSON(w, m{program.Name: "Created", "uid": response, "statusCode": 201}, http.StatusCreated)
+		wJSON(w, m{"successful": program.Name + " created", "uid": response, "statusCode": 201}, http.StatusCreated)
 	}
 }
 
@@ -100,28 +100,74 @@ func (h *handler) GetProgram() http.HandlerFunc {
 		uid := urlValues.Get("uid")
 
 		//check valid query
-		if len(urlValues) == 1 && uid != "" {
-			response, err := h.program.Get(uid)
-			if err != nil {
-				log.Printf("error get program: %v", err)
-				wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
-				return
-			}
-
-			if response[0].Name == "" {
-				wJSON(w, m{uid: "Not Found", "statusCode": 404}, http.StatusNotFound)
-				return
-			}
-			wJSON(w, m{"program": response[0]}, http.StatusOK)
+		if len(urlValues) != 1 || uid == "" {
+			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
 			return
 		}
 
-		wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
+		uidL := strings.ToLower(uid)
+
+		//TODO: add test cases
+
+		// check if uid is a hex type in 0x format or an int type
+		if !strings.HasPrefix(uidL, "0x") {
+
+			// check if uidL is int
+			_, err := strconv.Atoi(uidL)
+			if err != nil {
+				wJSON(w, m{"error": uid + " is invalid", "statusCode": 400}, http.StatusBadRequest)
+				return
+			}
+
+		} else {
+
+			//chech if it is hex
+			uidSplit := strings.Split(uidL, "x")[1]
+			_, err := strconv.ParseUint(uidSplit, 16, 32)
+			if err != nil {
+				wJSON(w, m{"error": uid + " is invalid", "statusCode": 400}, http.StatusBadRequest)
+				return
+			}
+		}
+
+		response, err := h.program.Get(uid)
+		if err != nil {
+			log.Printf("error get program: %v", err)
+			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			return
+		}
+
+		if response[0].Name == "" {
+			wJSON(w, m{"error": uid + " Not Found", "statusCode": 404}, http.StatusNotFound)
+			return
+		}
+		wJSON(w, m{"program": response[0], "statusCode": 200}, http.StatusOK)
 	}
 }
 
 func (h *handler) GetProgramList() http.HandlerFunc {
-	return func(rw http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 
+		// check there is no query in path
+		urlValues := r.URL.Query()
+		if len(urlValues) > 0 {
+			wJSON(w, m{"error": "No query allowed in URL", "statusCode": 400}, http.StatusBadRequest)
+			return
+		}
+
+		response, err := h.program.GetList()
+		if err != nil {
+			log.Printf("error get program: %v", err)
+			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			return
+		}
+
+		if len(response) == 0 {
+			wJSON(w, m{"message": "No saved programs", "statusCode": 200}, http.StatusOK)
+			return
+		}
+
+		wJSON(w, m{"programs": response, "statusCode": 200}, http.StatusOK)
 	}
+
 }

@@ -10,7 +10,9 @@ import (
 	"testing"
 )
 
-type mockProgramService struct{}
+type mockProgramService struct {
+	hasFlag bool
+}
 
 func (m *mockProgramService) New(program api.Program) (string, error) {
 
@@ -51,7 +53,30 @@ func (m *mockProgramService) Get(getBy string) ([]api.Program, error) {
 	return p.Program, nil
 }
 func (m *mockProgramService) GetList() ([]api.ProgramList, error) {
-	return nil, nil
+
+	// mock empty resource return
+	if m.hasFlag {
+		empty := api.GetPrograms{
+			List: []api.ProgramList{},
+		}
+
+		return empty.List, nil
+	}
+
+	//mock resource found successfully
+	p := api.GetPrograms{
+		List: []api.ProgramList{
+			{
+				Uid:  "uid1 response db",
+				Name: "name1 response db",
+			},
+			{
+				Uid:  "uid2 response db",
+				Name: "name2 response db",
+			},
+		},
+	}
+	return p.List, nil
 }
 
 func TestSaveProgram(t *testing.T) {
@@ -92,7 +117,7 @@ func TestSaveProgram(t *testing.T) {
 			want:        415,
 		},
 		{
-			name: "Error due to query in url ",
+			name: "Error due to query in url",
 			save: SaveReq{
 				Name:    "name test",
 				Program: "program test",
@@ -204,10 +229,69 @@ func TestGetProgram(t *testing.T) {
 			req.Header.Set("Accept", "application/json")
 
 			w := httptest.NewRecorder()
-			//TODO: delete
-			// h := handler{}
-			// hf := http.HandlerFunc(h.GetProgram())
+
 			hf := http.HandlerFunc(mockHandler.GetProgram())
+			hf.ServeHTTP(w, req)
+
+			response := w.Result()
+			defer response.Body.Close()
+
+			var body map[string]interface{}
+
+			err := json.NewDecoder(response.Body).Decode(&body)
+			if err != nil {
+				t.Errorf("expected error to be nil, got %v", err)
+			}
+
+			if response.StatusCode != test.want {
+				t.Errorf("test: - %s - failed. got: %d, want: %d, body: %v", test.name, response.StatusCode, test.want, body)
+
+			}
+		})
+
+	}
+}
+
+func TestGetProgramList(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		path    string
+		hasFlag bool
+		want    int
+	}{
+		{
+			name:    "return a program list succesfully",
+			path:    `/program/list`,
+			hasFlag: false,
+			want:    200,
+		},
+		{
+			name:    "empty resource return",
+			path:    `/program/list`,
+			hasFlag: true,
+			want:    200,
+		},
+		{
+			name:    "error due to query in url",
+			path:    `/program/list?uid=123`,
+			hasFlag: false,
+			want:    400,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			mockProgram := mockProgramService{hasFlag: test.hasFlag}
+			mockHandler := NewHandler(&mockProgram)
+
+			req := httptest.NewRequest(http.MethodGet, test.path, nil)
+			req.Header.Set("Accept", "application/json")
+
+			w := httptest.NewRecorder()
+
+			hf := http.HandlerFunc(mockHandler.GetProgramList())
 			hf.ServeHTTP(w, req)
 
 			response := w.Result()

@@ -1,7 +1,7 @@
 package api
 
 // Program represents de data of a program in Dgraph.
-// If UID field is empty when running a mutation for
+// If Uid field is empty when running a mutation for
 // a new node, Dgraph sets one.
 type Program struct {
 	Uid     string `json:"uid,omitempty"`
@@ -15,7 +15,7 @@ type ProgramList struct {
 	Name string `json:"name"`
 }
 
-// GetPrograms returns an array of query type.
+// GetPrograms returns an array for the query type.
 // Json tag must be used for the query name
 type GetPrograms struct {
 	Program []Program     `json:"program"`

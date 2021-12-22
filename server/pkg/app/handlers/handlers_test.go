@@ -221,6 +221,11 @@ func TestGetProgram(t *testing.T) {
 			path: "/program?uid=",
 			want: 400,
 		},
+		{
+			name: "error due to bad request, good query key but value is malformed",
+			path: "/program?uid=12f",
+			want: 400,
+		},
 	}
 
 	for _, test := range tests {

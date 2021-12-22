@@ -12,35 +12,56 @@ func (h *handler) Compiler() http.HandlerFunc {
 
 		// check content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			wJSON(w, m{"error": http.StatusText(http.StatusUnsupportedMediaType), "statusCode": 415}, http.StatusUnsupportedMediaType)
+			m := m{
+				"error":      http.StatusText(http.StatusUnsupportedMediaType),
+				"statusCode": 415,
+			}
+			wJSON(w, m, http.StatusUnsupportedMediaType)
 			return
 		}
 
 		dataCompiler := &CompilerClient{}
-		err := json.NewDecoder(r.Body).Decode(&dataCompiler)
+
+		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
+
+		err := decoder.Decode(&dataCompiler)
 		if err != nil {
-			log.Printf("data read error: %v", err)
-			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
+			log.Printf("Error Decode: %v", err)
+			m := m{
+				"error":      http.StatusText(http.StatusBadRequest),
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
 			return
 		}
 
 		response, err := dataCompiler.CompilerClient()
 		if err != nil {
+			if err.Error() == "bad request: data is missing" {
+				m := m{
+					"error":      err.Error(),
+					"statusCode": 400,
+				}
+				wJSON(w, m, http.StatusBadRequest)
+				return
+			}
 			log.Printf("Error request compiler: %v", err)
-			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			m := m{
+				"error":      http.StatusText(http.StatusInternalServerError),
+				"statusCode": 500,
+			}
+			wJSON(w, m, http.StatusInternalServerError)
 			return
 		}
 
-		//reponse as text/plain
+		//check text/plain
 		if response.Header.Get("Content-Type") == "text/plain" {
 			body := fmt.Sprintf("%v", response.Body)
-			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-			w.WriteHeader(response.StatusCode)
-			w.Write([]byte(body))
+			wJSON(w, m{"compiler": body}, response.StatusCode)
 			return
 		}
 
-		//response as JSON
 		wJSON(w, m{"compiler": response.Body}, response.StatusCode)
 	}
 }

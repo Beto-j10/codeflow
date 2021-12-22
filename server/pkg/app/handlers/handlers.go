@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// m type builds a map structure quickly to send a Responder
+// m type builds a map structure quickly to send to a Responder
 type m map[string]interface{}
 
 // wJSON marshals 'm' to JSON and setting the
@@ -50,14 +50,22 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 
 		// check content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			wJSON(w, m{"error": http.StatusText(http.StatusUnsupportedMediaType), "statusCode": 415}, http.StatusUnsupportedMediaType)
+			m := m{
+				"error":      http.StatusText(http.StatusUnsupportedMediaType),
+				"statusCode": 415,
+			}
+			wJSON(w, m, http.StatusUnsupportedMediaType)
 			return
 		}
 
 		// check there is no query in path
 		urlValues := r.URL.Query()
 		if len(urlValues) > 0 {
-			wJSON(w, m{"error": "No query allowed in URL", "statusCode": 400}, http.StatusBadRequest)
+			m := m{
+				"error":      "No query allowed in URL",
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
 			return
 		}
 
@@ -69,26 +77,47 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 		err := decoder.Decode(&program)
 		if err != nil {
 			log.Printf("Error Decode: %v", err)
-			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
+			m := m{
+				"error":      http.StatusText(http.StatusBadRequest),
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
 			return
 		}
 
 		response, err := h.program.New(*program)
 		if err != nil {
 			if err.Error() == "name already exists" {
-				wJSON(w, m{"error": err.Error(), "statusCode": 409}, http.StatusConflict)
+				m := m{
+					"error":      err.Error(),
+					"statusCode": 409,
+				}
+				wJSON(w, m, http.StatusConflict)
 				return
 			}
 			if err.Error() == "name required" || err.Error() == "program required" {
-				wJSON(w, m{"error": err.Error(), "statusCode": 400}, http.StatusBadRequest)
+				m := m{
+					"error":      err.Error(),
+					"statusCode": 400,
+				}
+				wJSON(w, m, http.StatusBadRequest)
 				return
 			}
 			log.Printf("Error save program: %v", err)
-			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			m := m{
+				"error":      http.StatusText(http.StatusInternalServerError),
+				"statusCode": 500,
+			}
+			wJSON(w, m, http.StatusInternalServerError)
 			return
 		}
 
-		wJSON(w, m{"successful": program.Name + " created", "uid": response, "statusCode": 201}, http.StatusCreated)
+		m := m{
+			"successful": program.Name + " created",
+			"uid":        response,
+			"statusCode": 201,
+		}
+		wJSON(w, m, http.StatusCreated)
 	}
 }
 
@@ -101,31 +130,41 @@ func (h *handler) GetProgram() http.HandlerFunc {
 
 		//check valid query
 		if len(urlValues) != 1 || uid == "" {
-			wJSON(w, m{"error": http.StatusText(http.StatusBadRequest), "statusCode": 400}, http.StatusBadRequest)
+			m := m{
+				"error":      http.StatusText(http.StatusBadRequest),
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
 			return
 		}
 
 		uidL := strings.ToLower(uid)
 
-		//TODO: add test cases
-
-		// check if uid is a hex type in 0x format or an int type
+		// check if uid is hex in 0x format or is int type
 		if !strings.HasPrefix(uidL, "0x") {
 
-			// check if uidL is int
+			// check if uid is int
 			_, err := strconv.Atoi(uidL)
 			if err != nil {
-				wJSON(w, m{"error": uid + " is invalid", "statusCode": 400}, http.StatusBadRequest)
+				m := m{
+					"error":      uid + " is invalid",
+					"statusCode": 400,
+				}
+				wJSON(w, m, http.StatusBadRequest)
 				return
 			}
 
 		} else {
 
-			//chech if it is hex
+			//chech if uid is hex
 			uidSplit := strings.Split(uidL, "x")[1]
 			_, err := strconv.ParseUint(uidSplit, 16, 32)
 			if err != nil {
-				wJSON(w, m{"error": uid + " is invalid", "statusCode": 400}, http.StatusBadRequest)
+				m := m{
+					"error":      uid + " is invalid",
+					"statusCode": 400,
+				}
+				wJSON(w, m, http.StatusBadRequest)
 				return
 			}
 		}
@@ -133,15 +172,27 @@ func (h *handler) GetProgram() http.HandlerFunc {
 		response, err := h.program.Get(uid)
 		if err != nil {
 			log.Printf("error get program: %v", err)
-			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			m := m{
+				"error":      http.StatusText(http.StatusInternalServerError),
+				"statusCode": 500,
+			}
+			wJSON(w, m, http.StatusInternalServerError)
 			return
 		}
 
 		if response[0].Name == "" {
-			wJSON(w, m{"error": uid + " Not Found", "statusCode": 404}, http.StatusNotFound)
+			m := m{
+				"error":      uid + " Not Found",
+				"statusCode": 404,
+			}
+			wJSON(w, m, http.StatusNotFound)
 			return
 		}
-		wJSON(w, m{"program": response[0], "statusCode": 200}, http.StatusOK)
+		m := m{
+			"program":    response[0],
+			"statusCode": 200,
+		}
+		wJSON(w, m, http.StatusOK)
 	}
 }
 
@@ -151,23 +202,39 @@ func (h *handler) GetProgramList() http.HandlerFunc {
 		// check there is no query in path
 		urlValues := r.URL.Query()
 		if len(urlValues) > 0 {
-			wJSON(w, m{"error": "No query allowed in URL", "statusCode": 400}, http.StatusBadRequest)
+			m := m{
+				"error":      "No query allowed in URL",
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
 			return
 		}
 
 		response, err := h.program.GetList()
 		if err != nil {
-			log.Printf("error get program: %v", err)
-			wJSON(w, m{"error": http.StatusText(http.StatusInternalServerError), "statusCode": 500}, http.StatusInternalServerError)
+			log.Printf("error get programs: %v", err)
+			m := m{
+				"error":      http.StatusText(http.StatusInternalServerError),
+				"statusCode": 500,
+			}
+			wJSON(w, m, http.StatusInternalServerError)
 			return
 		}
 
 		if len(response) == 0 {
-			wJSON(w, m{"message": "No saved programs", "statusCode": 200}, http.StatusOK)
+			m := m{
+				"message":    "No saved programs",
+				"statusCode": 200,
+			}
+			wJSON(w, m, http.StatusOK)
 			return
 		}
 
-		wJSON(w, m{"programs": response, "statusCode": 200}, http.StatusOK)
+		m := m{
+			"programs":   response,
+			"statusCode": 200,
+		}
+		wJSON(w, m, http.StatusOK)
 	}
 
 }

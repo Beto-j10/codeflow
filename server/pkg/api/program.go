@@ -2,13 +2,14 @@ package api
 
 import "errors"
 
-//TODO:Check pointer Program in ProgramService/New/handlers/storage
+// ProgramService contains the mothods of the program service
 type ProgramService interface {
 	New(program Program) (string, error)
 	Get(getBy string) ([]Program, error)
 	GetList() ([]ProgramList, error)
 }
 
+// ProgramRepository lets program service do db operations without knowing anything about the implementation
 type ProgramRepository interface {
 	SaveProgram(Program) (string, error)
 	GetProgram(getBy string) ([]Program, error)

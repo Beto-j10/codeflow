@@ -25,7 +25,7 @@ func NewServer(router *chi.Mux, handler handlers.Handler) *Server {
 	}
 }
 
-//TODO: add documentation autogenerate
+//TODO: add auto documentation
 func (s *Server) Run() error {
 
 	port := flag.String("port", "8080", "server port")

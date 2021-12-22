@@ -31,14 +31,22 @@ func TestCompilerClient(t *testing.T) {
 
 		//check request method
 		if r.Method != http.MethodPost {
-			wJSON(w, m{"error": http.StatusText(http.StatusMethodNotAllowed), "statusCode": 405}, http.StatusMethodNotAllowed)
+			m := m{
+				"error":      http.StatusText(http.StatusMethodNotAllowed),
+				"statusCode": 405,
+			}
+			wJSON(w, m, http.StatusMethodNotAllowed)
 
 			return
 		}
 
 		// check request content-type
 		if r.Header.Get("Content-Type") != "application/json" {
-			wJSON(w, m{"error": http.StatusText(http.StatusUnsupportedMediaType), "statusCode": 415}, http.StatusUnsupportedMediaType)
+			m := m{
+				"error":      http.StatusText(http.StatusUnsupportedMediaType),
+				"statusCode": 415,
+			}
+			wJSON(w, m, http.StatusUnsupportedMediaType)
 			return
 		}
 
@@ -48,7 +56,11 @@ func TestCompilerClient(t *testing.T) {
 		decoder.DisallowUnknownFields()
 		err := decoder.Decode(&c)
 		if err != nil {
-			wJSON(w, m{"error": err.Error(), "statusCode": 400}, http.StatusBadRequest)
+			m := m{
+				"error":      err.Error(),
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
 			return
 		}
 
@@ -62,7 +74,13 @@ func TestCompilerClient(t *testing.T) {
 				return
 			}
 		}
-		wJSON(w, m{"output": "Compiled code", "statusCode": "200", "memory": "7884", "cpuTime": "0.01"}, http.StatusOK)
+		m := m{
+			"output":     "Compiled code",
+			"statusCode": "200",
+			"memory":     "7884",
+			"cpuTime":    "0.01",
+		}
+		wJSON(w, m, http.StatusOK)
 	}))
 	defer ts.Close()
 

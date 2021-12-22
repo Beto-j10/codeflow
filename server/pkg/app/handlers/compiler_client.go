@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -28,8 +29,13 @@ var (
 	URL string
 )
 
-//TODO: add check for empty fields
 func (c *CompilerClient) CompilerClient() (*Response, error) {
+
+	if c.Language == "" || c.Script == "" || c.VersionIndex == "" {
+		err := errors.New("bad request: data is missing")
+		return nil, err
+	}
+
 	data, err := json.Marshal(c)
 	if err != nil {
 		return nil, err

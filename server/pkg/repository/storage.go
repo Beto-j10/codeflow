@@ -19,7 +19,6 @@ type Storage interface {
 	GetProgramList() ([]a.ProgramList, error)
 }
 
-//TODO check variables name // check log.Fatal
 type storage struct {
 	dgraphClient *dgo.Dgraph
 }

@@ -3,10 +3,8 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 )
 
@@ -64,16 +62,6 @@ func TestCompilerClient(t *testing.T) {
 			return
 		}
 
-		// check all data is filled in
-		// helps support the compiler data structure
-		v := reflect.ValueOf(c)
-		for i := 0; i < v.NumField(); i++ {
-			if reflect.DeepEqual(v.Field(i).Interface(), reflect.Zero(v.Field(i).Type()).Interface()) {
-				msg := fmt.Sprintf("Server - empty field: %v", v.Type().Field(i).Tag)
-				wJSON(w, m{"error": msg, "statusCode": "400"}, http.StatusBadRequest)
-				return
-			}
-		}
 		m := m{
 			"output":     "Compiled code",
 			"statusCode": "200",

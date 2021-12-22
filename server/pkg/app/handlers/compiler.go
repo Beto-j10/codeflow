@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func (h *handler) Compiler() http.HandlerFunc {
@@ -38,7 +39,7 @@ func (h *handler) Compiler() http.HandlerFunc {
 
 		response, err := dataCompiler.CompilerClient()
 		if err != nil {
-			if err.Error() == "bad request: data is missing" {
+			if strings.HasPrefix(err.Error(), "bad request:") {
 				m := m{
 					"error":      err.Error(),
 					"statusCode": 400,

@@ -4,8 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"reflect"
+	"strings"
 	"time"
 )
 
@@ -31,13 +35,25 @@ var (
 
 func (c *CompilerClient) CompilerClient() (*Response, error) {
 
-	if c.Language == "" || c.Script == "" || c.VersionIndex == "" {
-		err := errors.New("bad request: data is missing")
-		return nil, err
+	URL = "https://api.jdoodle.com/v1/execute"
+	// Check all data is filled in using reflect
+	v := reflect.ValueOf(*c)
+	for i := 0; i < v.NumField(); i++ {
+
+		// checks if the field value equals its zero value
+		if reflect.DeepEqual(v.Field(i).Interface(), reflect.Zero(v.Field(i).Type()).Interface()) {
+
+			tag := fmt.Sprintf("%v", v.Type().Field(i).Tag)
+			field := strings.Split(tag, ":")[1] // e.g, `json:"nameTag"` returns: "nameTag"
+			err := fmt.Sprintf("bad request: %s field empty", field)
+
+			return nil, errors.New(err)
+		}
 	}
 
 	data, err := json.Marshal(c)
 	if err != nil {
+		log.Printf("error marshal %v", err)
 		return nil, err
 	}
 
@@ -45,6 +61,7 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 
 	request, err := http.NewRequest("POST", URL, bytes.NewBuffer(data))
 	if err != nil {
+		log.Printf("error newRequest %v", err)
 		return nil, err
 	}
 
@@ -53,6 +70,7 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 
 	response, err := client.Do(request)
 	if err != nil {
+		log.Printf("error client.Do request %v", err)
 		return nil, err
 	}
 
@@ -68,6 +86,7 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 	if response.Header.Get("Content-Type") == "text/plain" {
 		bodyB, err := io.ReadAll(response.Body)
 		if err != nil {
+			log.Printf("error readAll body %v", err)
 			return nil, err
 		}
 		body := string(bodyB)
@@ -76,9 +95,10 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 	}
 
 	//send body as JSON
-	var body map[string]string
+	var body map[string]interface{}
 	err = json.NewDecoder(response.Body).Decode(&body)
 	if err != nil {
+		log.Printf("error newDecoder body %v", err)
 		return nil, err
 	}
 	res.Body = body

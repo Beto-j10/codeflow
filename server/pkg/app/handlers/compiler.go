@@ -8,10 +8,11 @@ import (
 	"strings"
 )
 
+// Compiler handles POST /compiler
 func (h *handler) Compiler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// check content-type
+		// Check content-type
 		if r.Header.Get("Content-Type") != "application/json" {
 			m := m{
 				"error":      http.StatusText(http.StatusUnsupportedMediaType),
@@ -37,7 +38,7 @@ func (h *handler) Compiler() http.HandlerFunc {
 			return
 		}
 
-		response, err := dataCompiler.CompilerClient()
+		response, err := dataCompiler.compilerClient(&h.config.Compiler)
 		if err != nil {
 			if strings.HasPrefix(err.Error(), "bad request:") {
 				m := m{
@@ -56,7 +57,7 @@ func (h *handler) Compiler() http.HandlerFunc {
 			return
 		}
 
-		//check text/plain
+		// Check text/plain
 		if response.Header.Get("Content-Type") == "text/plain" {
 			body := fmt.Sprintf("%v", response.Body)
 			wJSON(w, m{"compiler": body}, response.StatusCode)

@@ -8,6 +8,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.0
 	google.golang.org/grpc v1.42.0
+	gopkg.in/yaml.v2 v2.2.3
 )
 
 require (

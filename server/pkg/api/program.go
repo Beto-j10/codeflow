@@ -9,7 +9,7 @@ type ProgramService interface {
 	GetList() ([]ProgramList, error)
 }
 
-// ProgramRepository lets program service do db operations without knowing anything about the implementation
+// ProgramRepository lets program service do db operations
 type ProgramRepository interface {
 	SaveProgram(Program) (string, error)
 	GetProgram(getBy string) ([]Program, error)
@@ -20,12 +20,14 @@ type programService struct {
 	storage ProgramRepository
 }
 
+// NewProgramService creates a new program service
 func NewProgramService(programRepository ProgramRepository) ProgramService {
 	return &programService{
 		storage: programRepository,
 	}
 }
 
+// New tells db to save a new program and returns the uid
 func (p *programService) New(program Program) (string, error) {
 
 	if program.Name == "" {
@@ -43,6 +45,7 @@ func (p *programService) New(program Program) (string, error) {
 	return response, nil
 }
 
+// Get tells db to get a program by uid and returns an array with one program
 func (p *programService) Get(getBy string) ([]Program, error) {
 	response, err := p.storage.GetProgram(getBy)
 	if err != nil {
@@ -51,6 +54,7 @@ func (p *programService) Get(getBy string) ([]Program, error) {
 	return response, nil
 }
 
+// GetList tells db to get all programs and returns an array with all programs
 func (p *programService) GetList() ([]ProgramList, error) {
 	response, err := p.storage.GetProgramList()
 	if err != nil {

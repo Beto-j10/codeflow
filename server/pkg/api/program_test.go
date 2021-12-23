@@ -7,11 +7,13 @@ import (
 
 type mockProgramRepository struct{}
 
+// SaveProgram is a mock function for testing
 func (m mockProgramRepository) SaveProgram(program Program) (string, error) {
 	// mock successfully saved and return uid
 	return "uid test", nil
 }
 
+// GetProgram is a mock function for testing
 func (m mockProgramRepository) GetProgram(getBy string) ([]Program, error) {
 
 	//mock resource return
@@ -28,6 +30,7 @@ func (m mockProgramRepository) GetProgram(getBy string) ([]Program, error) {
 	return p.Program, nil
 }
 
+// GetProgramsList is a mock function for testing
 func (m mockProgramRepository) GetProgramList() ([]ProgramList, error) {
 
 	//mock resource return
@@ -47,6 +50,7 @@ func (m mockProgramRepository) GetProgramList() ([]ProgramList, error) {
 	return p.List, nil
 }
 
+// TestNew tests the New function
 func TestNew(t *testing.T) {
 	mockDB := mockProgramRepository{}
 	mockProgramService := NewProgramService(&mockDB)
@@ -92,6 +96,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
+// TestGet tests the Get function
 func TestGet(t *testing.T) {
 	mockDB := mockProgramRepository{}
 	mockProgramService := NewProgramService(&mockDB)
@@ -103,6 +108,7 @@ func TestGet(t *testing.T) {
 
 }
 
+// TestGetList tests the GetList function
 func TestGetList(t *testing.T) {
 	mockDB := mockProgramRepository{}
 	mockProgramService := NewProgramService(&mockDB)

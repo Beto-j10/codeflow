@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/dgraph-io/dgo/v210"
 	"github.com/dgraph-io/dgo/v210/protos/api"
@@ -12,6 +11,7 @@ import (
 	a "server/pkg/api"
 )
 
+// Storage is the interface for the storage
 type Storage interface {
 	SetupRepository() error
 	SaveProgram(program a.Program) (string, error)
@@ -23,12 +23,14 @@ type storage struct {
 	dgraphClient *dgo.Dgraph
 }
 
+// NewStorage creates a new storage
 func NewStorage(dgraphClient *dgo.Dgraph) Storage {
 	return &storage{
 		dgraphClient: dgraphClient,
 	}
 }
 
+// SetupRepository sets up the repository
 func (s *storage) SetupRepository() error {
 	op := &api.Operation{}
 	op.Schema = a.Schema
@@ -40,6 +42,7 @@ func (s *storage) SetupRepository() error {
 	return nil
 }
 
+// SaveProgram saves a program and returns the uid
 func (s *storage) SaveProgram(program a.Program) (string, error) {
 	ctx := context.Background()
 	txn := s.dgraphClient.NewTxn()
@@ -84,6 +87,7 @@ func (s *storage) SaveProgram(program a.Program) (string, error) {
 	return uid, nil
 }
 
+// GetProgram gets a program by uid and returns an array with one program
 func (s *storage) GetProgram(getBy string) ([]a.Program, error) {
 	ctx := context.Background()
 	const query = `query Program($uid: string)
@@ -105,7 +109,6 @@ func (s *storage) GetProgram(getBy string) ([]a.Program, error) {
 
 	response, err := txn.Do(ctx, req)
 	if err != nil {
-		fmt.Printf("\n#####%v\n", err)
 		return nil, err
 	}
 
@@ -117,6 +120,7 @@ func (s *storage) GetProgram(getBy string) ([]a.Program, error) {
 	return res.Program, nil
 }
 
+// GetProgramList gets all programs and returns an array with all programs
 func (s *storage) GetProgramList() ([]a.ProgramList, error) {
 
 	ctx := context.Background()

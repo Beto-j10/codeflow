@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"server/config"
 	"server/pkg/api"
 	"strconv"
 	"strings"
@@ -28,6 +29,7 @@ func wJSON(w http.ResponseWriter, response m, code int) {
 	w.Write(r)
 }
 
+// Handler is the interface that wraps the http.HandlerFunc methods.
 type Handler interface {
 	Compiler() http.HandlerFunc
 	SaveProgram() http.HandlerFunc
@@ -37,14 +39,18 @@ type Handler interface {
 
 type handler struct {
 	program api.ProgramService
+	config  *config.Config
 }
 
-func NewHandler(programService api.ProgramService) Handler {
+// NewHandler returns a new Handler
+func NewHandler(programService api.ProgramService, config *config.Config) Handler {
 	return &handler{
 		program: programService,
+		config:  config,
 	}
 }
 
+// SaveProgram handles POST /program
 func (h *handler) SaveProgram() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -121,6 +127,7 @@ func (h *handler) SaveProgram() http.HandlerFunc {
 	}
 }
 
+// GetProgram handles GET /program/{uid}
 func (h *handler) GetProgram() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -196,6 +203,7 @@ func (h *handler) GetProgram() http.HandlerFunc {
 	}
 }
 
+// GetProgramList handles GET /program
 func (h *handler) GetProgramList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

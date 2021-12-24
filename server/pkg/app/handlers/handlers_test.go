@@ -6,12 +6,20 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"server/config"
 	"server/pkg/api"
 	"testing"
 )
 
 type mockProgramService struct {
 	hasFlag bool
+}
+
+func mockNewHandler(hasFlag bool) Handler {
+	mockConfig := config.Config{}
+	mockProgram := mockProgramService{hasFlag: hasFlag}
+	return NewHandler(&mockProgram, &mockConfig)
+
 }
 
 func (m *mockProgramService) New(program api.Program) (string, error) {
@@ -79,10 +87,10 @@ func (m *mockProgramService) GetList() ([]api.ProgramList, error) {
 	return p.List, nil
 }
 
+// TestSaveProgram tests the SaveProgram handler
 func TestSaveProgram(t *testing.T) {
 
-	mockProgram := mockProgramService{}
-	mockHandler := NewHandler(&mockProgram)
+	mockHandler := mockNewHandler(false)
 
 	type SaveReq struct {
 		Name    string `json:"name"`
@@ -192,9 +200,10 @@ func TestSaveProgram(t *testing.T) {
 
 }
 
+// TestGetProgram tests the GetProgram handler
 func TestGetProgram(t *testing.T) {
-	mockProgram := mockProgramService{}
-	mockHandler := NewHandler(&mockProgram)
+
+	mockHandler := mockNewHandler(false)
 
 	tests := []struct {
 		name string
@@ -257,6 +266,7 @@ func TestGetProgram(t *testing.T) {
 	}
 }
 
+// TestGetProgramsList tests the GetProgramsList handler
 func TestGetProgramList(t *testing.T) {
 
 	tests := []struct {
@@ -267,19 +277,19 @@ func TestGetProgramList(t *testing.T) {
 	}{
 		{
 			name:    "return a program list succesfully",
-			path:    `/program/list`,
+			path:    `/program/all`,
 			hasFlag: false,
 			want:    200,
 		},
 		{
 			name:    "empty resource return",
-			path:    `/program/list`,
+			path:    `/program/all`,
 			hasFlag: true,
 			want:    200,
 		},
 		{
 			name:    "error due to query in url",
-			path:    `/program/list?uid=123`,
+			path:    `/program/all?uid=123`,
 			hasFlag: false,
 			want:    400,
 		},
@@ -288,8 +298,7 @@ func TestGetProgramList(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			mockProgram := mockProgramService{hasFlag: test.hasFlag}
-			mockHandler := NewHandler(&mockProgram)
+			mockHandler := mockNewHandler(test.hasFlag)
 
 			req := httptest.NewRequest(http.MethodGet, test.path, nil)
 			req.Header.Set("Accept", "application/json")

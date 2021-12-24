@@ -6,13 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"reflect"
+	"server/config"
 	"strings"
 	"time"
 )
 
+// CompilerClient handles POST /compiler
 type CompilerClient struct {
 	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
@@ -21,6 +22,7 @@ type CompilerClient struct {
 	VersionIndex string `json:"versionIndex"`
 }
 
+// Response is the response from the compiler
 type Response struct {
 	Status     string
 	StatusCode int
@@ -28,23 +30,22 @@ type Response struct {
 	Body       interface{}
 }
 
-//TODO: add to config
-var (
-	URL string
-)
+// CompilerClient does a POST request to the compiler and returns the response
+func (c *CompilerClient) compilerClient(config *config.CompilerConfig) (*Response, error) {
 
-func (c *CompilerClient) CompilerClient() (*Response, error) {
+	URL := config.URL
+	c.ClientID = config.ClientId
+	c.ClientSecret = config.ClientSecret
 
-	URL = "https://api.jdoodle.com/v1/execute"
 	// Check all data is filled in using reflect
 	v := reflect.ValueOf(*c)
 	for i := 0; i < v.NumField(); i++ {
 
-		// checks if the field value equals its zero value
+		// Checks if the field value equals its zero value
 		if reflect.DeepEqual(v.Field(i).Interface(), reflect.Zero(v.Field(i).Type()).Interface()) {
 
-			tag := fmt.Sprintf("%v", v.Type().Field(i).Tag)
-			field := strings.Split(tag, ":")[1] // e.g, `json:"nameTag"` returns: "nameTag"
+			tag := fmt.Sprintf("%v", v.Type().Field(i).Tag) // get the field tag
+			field := strings.Split(tag, ":")[1]             // get the field name, e.g., `json:"nameTag"` returns: "nameTag"
 			err := fmt.Sprintf("bad request: %s field empty", field)
 
 			return nil, errors.New(err)
@@ -53,7 +54,6 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 
 	data, err := json.Marshal(c)
 	if err != nil {
-		log.Printf("error marshal %v", err)
 		return nil, err
 	}
 
@@ -61,7 +61,6 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 
 	request, err := http.NewRequest("POST", URL, bytes.NewBuffer(data))
 	if err != nil {
-		log.Printf("error newRequest %v", err)
 		return nil, err
 	}
 
@@ -70,7 +69,6 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 
 	response, err := client.Do(request)
 	if err != nil {
-		log.Printf("error client.Do request %v", err)
 		return nil, err
 	}
 
@@ -82,11 +80,10 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 		Header:     response.Header,
 	}
 
-	//send body as text/plain
+	// Send body as text/plain
 	if response.Header.Get("Content-Type") == "text/plain" {
 		bodyB, err := io.ReadAll(response.Body)
 		if err != nil {
-			log.Printf("error readAll body %v", err)
 			return nil, err
 		}
 		body := string(bodyB)
@@ -94,11 +91,10 @@ func (c *CompilerClient) CompilerClient() (*Response, error) {
 		return res, nil
 	}
 
-	//send body as JSON
+	// Send body as JSON
 	var body map[string]interface{}
 	err = json.NewDecoder(response.Body).Decode(&body)
 	if err != nil {
-		log.Printf("error newDecoder body %v", err)
 		return nil, err
 	}
 	res.Body = body

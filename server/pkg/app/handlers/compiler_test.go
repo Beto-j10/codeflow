@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"server/config"
 	"testing"
 )
 
+// CompilerResp is the response from the compiler
 type CompilerResp struct {
 	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
@@ -15,6 +17,8 @@ type CompilerResp struct {
 	Language     string `json:"language"`
 	VersionIndex string `json:"versionIndex"`
 }
+
+// CompilerReq is the request body for the compiler
 type CompilerReq struct {
 	ClientID     string `json:"clientId"`
 	ClientSecret string `json:"clientSecret"`
@@ -23,6 +27,7 @@ type CompilerReq struct {
 	VersionIndex string `json:"versionIndex"`
 }
 
+// TestCompiler tests the compiler handler and compiler client
 func TestCompilerClient(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -128,9 +133,16 @@ func TestCompilerClient(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/compiler", bytes.NewBuffer(dataReq))
 			req.Header.Set("Content-Type", test.contentType)
 
-			URL = ts.URL
 			w := httptest.NewRecorder()
-			h := handler{}
+			h := handler{
+				config: &config.Config{
+					Compiler: config.CompilerConfig{
+						URL:          ts.URL,
+						ClientId:     test.compiler.ClientID,
+						ClientSecret: test.compiler.ClientSecret,
+					},
+				},
+			}
 			hf := http.HandlerFunc(h.Compiler())
 			hf.ServeHTTP(w, req)
 

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"server/config"
 	a "server/pkg/api"
 	"server/pkg/app"
 	"server/pkg/app/handlers"
@@ -23,33 +25,45 @@ func main() {
 }
 
 func run() error {
-	client := newClientDgraph()
+	config, err := config.LoadConfig("config.yml")
+	if err != nil {
+		return err
+	}
+
+	serverPort := flag.String("port", config.Server.Port, "server port")
+	dgraphClient := flag.String("dgraph", config.Dgraph.Port, "dgraph port")
+	flag.Parse()
+
+	client := newClientDgraph(*dgraphClient)
 	storage := repository.NewStorage(client)
 
-	err := storage.SetupRepository()
+	err = storage.SetupRepository()
 	if err != nil {
 		return err
 	}
 
 	programService := a.NewProgramService(storage)
-	handler := handlers.NewHandler(programService)
+	handler := handlers.NewHandler(programService, config)
 	router := chi.NewRouter()
 	server := app.NewServer(router, handler)
 
 	// start server
-	err = server.Run()
+	err = server.Run(*serverPort)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func newClientDgraph() *dgo.Dgraph {
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+func newClientDgraph(port string) *dgo.Dgraph {
+
+	target := fmt.Sprintf("localhost:%s", port)
+	conn, err := grpc.Dial(target, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Printf("Connected to Dgraph at port %s", port)
 	return dgo.NewDgraphClient(
 		api.NewDgraphClient(conn),
 	)

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"flag"
 	"log"
 	"net/http"
 	"time"
@@ -18,6 +17,7 @@ type Server struct {
 	handler handlers.Handler
 }
 
+// NewServer creates a new server
 func NewServer(router *chi.Mux, handler handlers.Handler) *Server {
 	return &Server{
 		router:  router,
@@ -25,16 +25,15 @@ func NewServer(router *chi.Mux, handler handlers.Handler) *Server {
 	}
 }
 
-//TODO: add auto documentation
-func (s *Server) Run() error {
-
-	port := flag.String("port", "8080", "server port")
-	flag.Parse()
+// Run starts the server
+func (s *Server) Run(port string) error {
 
 	s.config()
 	router := s.Routes()
 
-	err := http.ListenAndServe(":"+*port, router)
+	log.Printf("Server is running on port %v", port)
+	addr := ":" + port
+	err := http.ListenAndServe(addr, router)
 	if err != nil {
 		log.Printf("Error running serve: %v", err)
 		return err

@@ -45,7 +45,7 @@ import styleDrawflow from 'drawflow/dist/drawflow.min.css'
 import style from '../assets/style.css'
 import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref } from 'vue'
 import Number from './nodes/Number.vue'
-import Node2 from './nodes/Node2.vue'
+import NodeAdd from './nodes/Add.vue'
 
 
 export default {
@@ -113,7 +113,7 @@ export default {
             editor.value.start();
 
             editor.value.registerNode('Num', Number, {}, {});
-            editor.value.registerNode('Addx', Node2, {}, {});
+            editor.value.registerNode('Addx', NodeAdd, {}, {});
 
             // editor.value.import(
             //     {

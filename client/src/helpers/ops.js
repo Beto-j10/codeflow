@@ -1,9 +1,9 @@
 export function add(df, nodeId) {
 
-    let dataNode = {}
-    dataNode = df.getNodeFromId(nodeId)
+    let nodeData = {}
+    nodeData = df.getNodeFromId(nodeId)
 
-    const inputs = dataNode.inputs
+    const inputs = nodeData.inputs
     let addNum = 0
 
     if (inputs.input_1.connections.at(0) && inputs.input_2.connections.at(0)) {
@@ -14,6 +14,6 @@ export function add(df, nodeId) {
         }
 
     }
-    dataNode.data.num = addNum;
-    df.updateNodeDataFromId(nodeId, dataNode.data);
+    nodeData.data.num = addNum;
+    df.updateNodeDataFromId(nodeId, nodeData.data);
 }

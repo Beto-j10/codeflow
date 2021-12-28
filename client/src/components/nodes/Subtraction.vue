@@ -2,7 +2,7 @@
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
-import { add } from '../../modules/ops';
+import { sub } from '../../modules/ops';
 
 export default defineComponent({
     components: {
@@ -25,7 +25,7 @@ export default defineComponent({
         });
 
         watch(sharedState, () => {
-            add(df, nodeId.value)
+            sub(df, nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
         })

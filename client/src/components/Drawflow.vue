@@ -46,6 +46,7 @@ import style from '../assets/style.css'
 import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref } from 'vue'
 import Number from './nodes/Number.vue'
 import NodeAdd from './nodes/Add.vue'
+import NodeSub from './nodes/Subtraction.vue'
 
 
 export default {
@@ -61,10 +62,21 @@ export default {
                 data: {
                     num: 0,
                 }
-            }, {
+            },
+            {
                 name: 'Add',
                 color: '#49433440',
                 item: 'Addx',
+                input: 2,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
+            {
+                name: 'Subtraction',
+                color: '#49433440',
+                item: 'Sub',
                 input: 2,
                 output: 1,
                 data: {
@@ -114,6 +126,7 @@ export default {
 
             editor.value.registerNode('Num', Number, {}, {});
             editor.value.registerNode('Addx', NodeAdd, {}, {});
+            editor.value.registerNode('Sub', NodeSub, {}, {});
 
             // editor.value.import(
             //     {

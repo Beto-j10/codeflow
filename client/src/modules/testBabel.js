@@ -5,7 +5,7 @@ import { parse } from "@babel/parser";
 import generate from '@babel/generator';
 import template from '@babel/template';
 
-import compiler from './service/compiler';
+import compiler from '../service/compiler';
 
 export default function fun() {
     const code = `

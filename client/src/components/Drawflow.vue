@@ -47,6 +47,7 @@ import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref } f
 import Number from './nodes/Number.vue'
 import NodeAdd from './nodes/Add.vue'
 import NodeSub from './nodes/Subtraction.vue'
+import NodeMult from './nodes/Multiplication.vue'
 
 
 export default {
@@ -77,6 +78,16 @@ export default {
                 name: 'Subtraction',
                 color: '#49433440',
                 item: 'Sub',
+                input: 2,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
+            {
+                name: 'Multiplication',
+                color: '#49433440',
+                item: 'Mult',
                 input: 2,
                 output: 1,
                 data: {
@@ -127,6 +138,7 @@ export default {
             editor.value.registerNode('Num', Number, {}, {});
             editor.value.registerNode('Addx', NodeAdd, {}, {});
             editor.value.registerNode('Sub', NodeSub, {}, {});
+            editor.value.registerNode('Mult', NodeMult, {}, {});
 
             // editor.value.import(
             //     {

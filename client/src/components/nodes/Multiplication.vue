@@ -2,7 +2,7 @@
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
-import { add } from '../../modules/ops';
+import { multiplication } from '../../modules/ops';
 
 export default defineComponent({
     components: {
@@ -27,7 +27,7 @@ export default defineComponent({
 
         // check if the value of one of your inputs changed
         watch(sharedState, () => {
-            add(df, nodeId.value)
+            multiplication(df, nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
         })
@@ -42,7 +42,7 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <NodeHeader title="Addition" />
+        <NodeHeader title="Multiplication" />
         <el-input-number v-model="num" disabled :controls="false" df-num />
     </div>
 </template>

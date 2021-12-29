@@ -17,6 +17,11 @@ export default defineComponent({
         const sharedState = reactive(store.state)
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
+        // df.on('connectionCreated', (ids) => {
+        //     console.log('node moved %%%%%%%%%%%%%%%%%%%%%%%%%%%%', getCurrentInstance())
+        // })
+
+
 
         onMounted(async () => {
             await nextTick()
@@ -25,7 +30,7 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
         });
 
-        // check if the value of one of your inputs changed
+        // check if the value of one of its inputs changed
         watch(sharedState, () => {
             multiplication(df, nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)

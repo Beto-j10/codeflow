@@ -49,6 +49,8 @@ import NodeAdd from './nodes/Add.vue'
 import NodeSub from './nodes/Subtraction.vue'
 import NodeMult from './nodes/Multiplication.vue'
 import NodeDiv from './nodes/Division.vue'
+import NodeAssign from './nodes/Assign.vue'
+import store from '../store'
 
 
 export default {
@@ -105,6 +107,16 @@ export default {
                     num: 0,
                 }
             },
+            {
+                name: 'Assign',
+                color: '#49433440',
+                item: 'Assign',
+                input: 1,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
         ])
 
         const editor = shallowRef({})
@@ -151,6 +163,14 @@ export default {
             editor.value.registerNode('Sub', NodeSub, {}, {});
             editor.value.registerNode('Mult', NodeMult, {}, {});
             editor.value.registerNode('Div', NodeDiv, {}, {});
+            editor.value.registerNode('Assign', NodeAssign, {}, {});
+
+            editor.value.on('connectionCreated', (node) => {
+                store.updateState()
+            });
+            editor.value.on('connectionRemoved', (node) => {
+                store.updateState()
+            });
 
             // editor.value.import(
             //     {

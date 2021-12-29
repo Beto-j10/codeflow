@@ -2,7 +2,7 @@
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
-import { Division } from '../../modules/ops';
+import { division } from '../../modules/ops';
 
 export default defineComponent({
     components: {
@@ -25,9 +25,9 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
         });
 
-        // check if the value of one of your inputs changed
+        // check if the value of one of its inputs changed
         watch(sharedState, () => {
-            Division(df, nodeId.value)
+            division(df, nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
         })

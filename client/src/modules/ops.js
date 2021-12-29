@@ -90,7 +90,7 @@ export function multiplication(df, nodeId) {
  * @param {string} nodeId 
  */
 
-export function Division(df, nodeId) {
+export function division(df, nodeId) {
 
     let nodeData = {}
     nodeData = df.getNodeFromId(nodeId)
@@ -113,6 +113,30 @@ export function Division(df, nodeId) {
 
         let result = inputValues[0] / inputValues[1]; //divides the value of input 1 by input 2
         nodeData.data.num = Math.round(result * 100) / 100
+
+    } else {
+        nodeData.data.num = 0
+    }
+    df.updateNodeDataFromId(nodeId, nodeData.data);
+}
+
+/**
+ * assigns the value of its input to the node value
+ * @param {object} df 
+ * @param {string} nodeId 
+ */
+
+export function assign(df, nodeId) {
+
+    let nodeData = {}
+    nodeData = df.getNodeFromId(nodeId)
+
+    const inputs = nodeData.inputs
+    if (inputs.input_1.connections.at(0)) {
+
+        const inputId = inputs.input_1.connections[0].node
+        const inputData = df.getNodeFromId(inputId)
+        nodeData.data.num = inputData.data.num
 
     } else {
         nodeData.data.num = 0

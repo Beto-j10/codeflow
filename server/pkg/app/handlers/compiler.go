@@ -22,6 +22,17 @@ func (h *handler) Compiler() http.HandlerFunc {
 			return
 		}
 
+		// check there is no query in path
+		urlValues := r.URL.Query()
+		if len(urlValues) > 0 {
+			m := m{
+				"error":      "No query allowed in URL",
+				"statusCode": 400,
+			}
+			wJSON(w, m, http.StatusBadRequest)
+			return
+		}
+
 		dataCompiler := &CompilerClient{}
 
 		decoder := json.NewDecoder(r.Body)

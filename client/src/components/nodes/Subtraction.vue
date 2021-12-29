@@ -1,16 +1,12 @@
 <script>
-import { defineComponent, ref, onMounted, getCurrentInstance, nextTick } from 'vue';
+import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
+import { subtraction } from '../../modules/ops';
 
 export default defineComponent({
     components: {
         NodeHeader
-    },
-    data() {
-        return {
-            sharedState: store.state
-        }
     },
     setup() {
         const el = ref(null);
@@ -18,13 +14,8 @@ export default defineComponent({
         const nodeId = ref(0);
         const nodeData = ref({});
         const num = ref(0)
+        const sharedState = reactive(store.state)
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
-
-        const handleChange = (value) => {
-            nodeData.value.data.num = value;
-            df.updateNodeDataFromId(nodeId.value, nodeData.value.data);
-            store.updateState()
-        }
 
         onMounted(async () => {
             await nextTick()
@@ -33,10 +24,16 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
         });
 
+        // check if the value of one of your inputs changed
+        watch(sharedState, () => {
+            subtraction(df, nodeId.value)
+            nodeData.value = df.getNodeFromId(nodeId.value)
+            num.value = nodeData.value.data.num;
+        })
+
         return {
             el,
             num,
-            handleChange,
         }
     },
 })
@@ -44,7 +41,7 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <NodeHeader title="Number" />
-        <el-input-number v-model="num" :controls="false" @change="handleChange" df-num />
+        <NodeHeader title="Subtraction" />
+        <el-input-number v-model="num" disabled :controls="false" df-num />
     </div>
 </template>

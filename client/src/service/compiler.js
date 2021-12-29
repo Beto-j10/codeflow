@@ -1,5 +1,5 @@
 export default async function compiler(url = '', data = {}) {
-  console.log((typeof data))
+  // console.log((typeof data))
     const response = await fetch(url, {
       method: 'POST',
       headers: {

@@ -5,7 +5,7 @@ import { parse } from "@babel/parser";
 import generate from '@babel/generator';
 import template from '@babel/template';
 
-import compiler from './api/compiler';
+import compiler from '../service/compiler';
 
 export default function fun() {
     const code = `
@@ -25,7 +25,7 @@ export default function fun() {
     `;
 
     const astP = template.ast(code)
-    console.log("####", JSON.stringify(astP, null, 2), "#####")
+    // console.log("####", JSON.stringify(astP, null, 2), "#####")
 
 
     const ast = parse(code)
@@ -63,13 +63,10 @@ function transformToCode(type, forMin, forMax) {
     console.log("##Pyhton: ", code)
     const dataCompiler = {
         //TODO: add environment vars
-        clientId:       '',
-        clientSecret:   '',
         script:         code,
         language:       'python3',
         versionIndex:   '3'
     }
-    // compiler('https://cors-anywhere.herokuapp.com/https://api.jdoodle.com/v1/execute',dataCompiler)
-    compiler('http://localhost:8080/v1/api/compiler',dataCompiler)
-        .then(response => console.log(response))
+    compiler('http://localhost:5000/v1/api/compiler',dataCompiler)
+        // .then(response => console.log(response))
 }

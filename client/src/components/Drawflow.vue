@@ -45,7 +45,10 @@ import styleDrawflow from 'drawflow/dist/drawflow.min.css'
 import style from '../assets/style.css'
 import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref } from 'vue'
 import Number from './nodes/Number.vue'
-import Node2 from './nodes/Node2.vue'
+import NodeAdd from './nodes/Add.vue'
+import NodeSub from './nodes/Subtraction.vue'
+import NodeMult from './nodes/Multiplication.vue'
+import NodeDiv from './nodes/Division.vue'
 
 
 export default {
@@ -61,10 +64,41 @@ export default {
                 data: {
                     num: 0,
                 }
-            }, {
+            },
+            {
                 name: 'Add',
                 color: '#49433440',
                 item: 'Addx',
+                input: 2,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
+            {
+                name: 'Subtraction',
+                color: '#49433440',
+                item: 'Sub',
+                input: 2,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
+            {
+                name: 'Multiplication',
+                color: '#49433440',
+                item: 'Mult',
+                input: 2,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
+            {
+                name: 'Division',
+                color: '#49433440',
+                item: 'Div',
                 input: 2,
                 output: 1,
                 data: {
@@ -113,7 +147,10 @@ export default {
             editor.value.start();
 
             editor.value.registerNode('Num', Number, {}, {});
-            editor.value.registerNode('Addx', Node2, {}, {});
+            editor.value.registerNode('Addx', NodeAdd, {}, {});
+            editor.value.registerNode('Sub', NodeSub, {}, {});
+            editor.value.registerNode('Mult', NodeMult, {}, {});
+            editor.value.registerNode('Div', NodeDiv, {}, {});
 
             // editor.value.import(
             //     {

@@ -48,6 +48,7 @@ import Number from './nodes/Number.vue'
 import NodeAdd from './nodes/Add.vue'
 import NodeSub from './nodes/Subtraction.vue'
 import NodeMult from './nodes/Multiplication.vue'
+import NodeDiv from './nodes/Division.vue'
 
 
 export default {
@@ -88,6 +89,16 @@ export default {
                 name: 'Multiplication',
                 color: '#49433440',
                 item: 'Mult',
+                input: 2,
+                output: 1,
+                data: {
+                    num: 0,
+                }
+            },
+            {
+                name: 'Division',
+                color: '#49433440',
+                item: 'Div',
                 input: 2,
                 output: 1,
                 data: {
@@ -139,6 +150,7 @@ export default {
             editor.value.registerNode('Addx', NodeAdd, {}, {});
             editor.value.registerNode('Sub', NodeSub, {}, {});
             editor.value.registerNode('Mult', NodeMult, {}, {});
+            editor.value.registerNode('Div', NodeDiv, {}, {});
 
             // editor.value.import(
             //     {

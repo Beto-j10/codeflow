@@ -18,7 +18,7 @@ export function add(df, nodeId) {
         }
 
     }
-    nodeData.data.num = addNum;
+    nodeData.data.num = Math.round(addNum * 100) / 100
     df.updateNodeDataFromId(nodeId, nodeData.data);
 }
 
@@ -44,19 +44,22 @@ export function subtraction(df, nodeId) {
             inputValues.push(inputData.data.num) //adds the value of the input to the array
         }
 
+        let result = inputValues[0] - inputValues[1] //subtracts the value of input 2 from input 1
+        nodeData.data.num = Math.round(result * 100) / 100
+
+    } else {
+        nodeData.data.num = 0
     }
-    nodeData.data.num = inputValues[0] - inputValues[1]; //subtracts the value of input 2 from input 1
     df.updateNodeDataFromId(nodeId, nodeData.data);
 }
 
 /**
- * the value of input 1 subtracts the value of input 2
- * and adds the result to the value of the node
+ * Add to the value of the node the multiplication of the values of its inputs
  * @param {object} df 
  * @param {string} nodeId 
  */
 
- export function multiplication(df, nodeId) {
+export function multiplication(df, nodeId) {
 
     let nodeData = {}
     nodeData = df.getNodeFromId(nodeId)
@@ -71,7 +74,48 @@ export function subtraction(df, nodeId) {
             multipliedNums *= inputData.data.num
         }
 
+        nodeData.data.num = Math.round(multipliedNums * 100) / 100
+
+    } else {
+        nodeData.data.num = 0
     }
-    nodeData.data.num = multipliedNums;
+    df.updateNodeDataFromId(nodeId, nodeData.data);
+}
+
+
+/**
+ * the value of input 1 is divided into the value of input 2
+ * and adds the result to the value of the node
+ * @param {object} df 
+ * @param {string} nodeId 
+ */
+
+export function Division(df, nodeId) {
+
+    let nodeData = {}
+    nodeData = df.getNodeFromId(nodeId)
+
+    const inputs = nodeData.inputs
+    let inputValues = []
+    if (inputs.input_1.connections.at(0) && inputs.input_2.connections.at(0)) {
+        for (const input in inputs) {
+            const inputId = inputs[input].connections[0].node
+            const inputData = df.getNodeFromId(inputId)
+            inputValues.push(inputData.data.num) //adds the value of the input to the array
+        }
+
+        // Check that the divisor is not 0
+        if (inputValues[1] === 0) {
+            nodeData.data.num = 0
+            df.updateNodeDataFromId(nodeId, nodeData.data);
+            return
+        }
+
+        let result = inputValues[0] / inputValues[1]; //divides the value of input 1 by input 2
+        nodeData.data.num = Math.round(result * 100) / 100
+
+    } else {
+        nodeData.data.num = 0
+    }
     df.updateNodeDataFromId(nodeId, nodeData.data);
 }

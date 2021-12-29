@@ -29,9 +29,7 @@ export default defineComponent({
         onMounted(async () => {
             await nextTick()
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
-            // console.log("nodeid: ",nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)
-            console.log("nodeid: ",nodeData.value)
             num.value = nodeData.value.data.num;
         });
 

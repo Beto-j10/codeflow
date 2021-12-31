@@ -43,7 +43,7 @@
 import Drawflow from 'drawflow'
 import styleDrawflow from 'drawflow/dist/drawflow.min.css'
 import style from '../assets/style.css'
-import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref } from 'vue'
+import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref, nextTick } from 'vue'
 import Number from './nodes/Number.vue'
 import NodeAdd from './nodes/Add.vue'
 import NodeSub from './nodes/Subtraction.vue'
@@ -51,6 +51,8 @@ import NodeMult from './nodes/Multiplication.vue'
 import NodeDiv from './nodes/Division.vue'
 import NodeAssign from './nodes/Assign.vue'
 import store from '../store'
+import { checkConnections } from '../modules/restraints'
+import { stopWatch } from '../helpers/stopWatch'
 
 
 export default {
@@ -70,7 +72,7 @@ export default {
             {
                 name: 'Add',
                 color: '#49433440',
-                item: 'Addx',
+                item: 'Add',
                 input: 2,
                 output: 1,
                 data: {
@@ -159,16 +161,23 @@ export default {
             editor.value.start();
 
             editor.value.registerNode('Num', Number, {}, {});
-            editor.value.registerNode('Addx', NodeAdd, {}, {});
+            editor.value.registerNode('Add', NodeAdd, {}, {});
             editor.value.registerNode('Sub', NodeSub, {}, {});
             editor.value.registerNode('Mult', NodeMult, {}, {});
             editor.value.registerNode('Div', NodeDiv, {}, {});
             editor.value.registerNode('Assign', NodeAssign, {}, {});
 
-            editor.value.on('connectionCreated', (node) => {
+            editor.value.on('nodeRemoved', (id) => {
+                stopWatch(id);
+            });
+
+            editor.value.on('connectionCreated', (ids) => {
+                // checkConnections(ids, editor.value);
                 store.updateState()
             });
-            editor.value.on('connectionRemoved', (node) => {
+
+            editor.value.on('connectionRemoved', async () => {
+                await nextTick()
                 store.updateState()
             });
 

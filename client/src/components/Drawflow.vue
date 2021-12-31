@@ -51,7 +51,7 @@ import NodeMult from './nodes/Multiplication.vue'
 import NodeDiv from './nodes/Division.vue'
 import NodeAssign from './nodes/Assign.vue'
 import store from '../store'
-import { checkConnections } from '../modules/restraints'
+import { checkConnections } from '../modules/constraints'
 import { stopWatch } from '../helpers/stopWatch'
 
 
@@ -67,7 +67,8 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
-                }
+                },
+                class: "number",
             },
             {
                 name: 'Add',
@@ -77,7 +78,8 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
-                }
+                },
+                class: "ops",
             },
             {
                 name: 'Subtraction',
@@ -87,7 +89,8 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
-                }
+                },
+                class: "ops",
             },
             {
                 name: 'Multiplication',
@@ -97,7 +100,8 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
-                }
+                },
+                class: "ops",
             },
             {
                 name: 'Division',
@@ -107,7 +111,8 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
-                }
+                },
+                class: "ops",
             },
             {
                 name: 'Assign',
@@ -117,7 +122,8 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
-                }
+                },
+                class: "assign",
             },
         ])
 
@@ -149,7 +155,7 @@ export default {
             pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
 
             const nodeSelected = listNodes.find(ele => ele.item == name);
-            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, name, nodeSelected.data, name, 'vue');
+            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, nodeSelected.class, nodeSelected.data, name, 'vue');
 
         }
 
@@ -172,7 +178,7 @@ export default {
             });
 
             editor.value.on('connectionCreated', (ids) => {
-                // checkConnections(ids, editor.value);
+                checkConnections(ids, editor.value);
                 store.updateState()
             });
 

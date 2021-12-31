@@ -67,6 +67,6 @@ function transformToCode(type, forMin, forMax) {
         language:       'python3',
         versionIndex:   '3'
     }
-    compiler('http://localhost:5000/v1/api/compiler',dataCompiler)
+    // compiler('http://localhost:5000/v1/api/compiler',dataCompiler)
         // .then(response => console.log(response))
 }

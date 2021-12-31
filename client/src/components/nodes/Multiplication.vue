@@ -3,6 +3,7 @@ import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, r
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { multiplication } from '../../modules/ops';
+import { registerStop } from '../../helpers/stopWatch';
 
 export default defineComponent({
     components: {
@@ -17,25 +18,21 @@ export default defineComponent({
         const sharedState = reactive(store.state)
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
-        // df.on('connectionCreated', (ids) => {
-        //     console.log('node moved %%%%%%%%%%%%%%%%%%%%%%%%%%%%', getCurrentInstance())
-        // })
-
-
+        // check if the value of one of its inputs changed
+        const stop = watch(sharedState, () => {
+            multiplication(df, nodeId.value)
+            nodeData.value = df.getNodeFromId(nodeId.value)
+            num.value = nodeData.value.data.num;
+        })
 
         onMounted(async () => {
             await nextTick()
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
-        });
 
-        // check if the value of one of its inputs changed
-        watch(sharedState, () => {
-            multiplication(df, nodeId.value)
-            nodeData.value = df.getNodeFromId(nodeId.value)
-            num.value = nodeData.value.data.num;
-        })
+            registerStop(nodeId.value, stop)
+        });
 
         return {
             el,
@@ -48,6 +45,6 @@ export default defineComponent({
 <template>
     <div ref="el">
         <NodeHeader title="Multiplication" />
-        <el-input-number v-model="num" disabled :controls="false" df-num />
+        <el-input-number v-model="num" :controls="false" df-num />
     </div>
 </template>

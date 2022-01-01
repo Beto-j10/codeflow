@@ -16,9 +16,8 @@ export function add(df, nodeId) {
             const inputData = df.getNodeFromId(inputId)
             addNum += inputData.data.num
         }
-
+        nodeData.data.num = Math.round(addNum * 100) / 100
     }
-    nodeData.data.num = Math.round(addNum * 100) / 100
     df.updateNodeDataFromId(nodeId, nodeData.data);
 }
 

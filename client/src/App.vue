@@ -24,9 +24,7 @@ html {
     background: transparent;
 }
 body {
-    max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 40px);
-    margin: 20px;
+    margin: 10px;
     padding: 0;
     background: #181818;
     color: #f7f7f7;

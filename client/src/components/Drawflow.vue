@@ -284,6 +284,7 @@ export default {
 .column ul {
     padding-inline-start: 0px;
     padding: 10px 10px;
+    list-style: none;
 }
 .column li {
     background: transparent;

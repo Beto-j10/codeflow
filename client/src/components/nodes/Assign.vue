@@ -44,8 +44,29 @@ export default defineComponent({
 </script>
 //TODO: change Component
 <template>
-    <div ref="el">
+    <div ref="el" class="assign">
         <NodeHeader title="Assign" />
-        <el-input-number v-model="num" :controls="false" df-num />
+        <!-- <el-input-number v-model="num" :controls="false" df-num /> -->
+        <div class="assign__container">
+            <span class="assign__text">{{ num }}</span>
+        </div>
     </div>
 </template>
+
+<style scoped>
+.assign__container {
+    /* background-color: #fff; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* width: 100%;
+    height: 100%; */
+}
+.assign__text {
+    display: block;
+    margin: 0 auto;
+    color: #fff;
+    text-align: center;
+    font-size: 1.2rem;
+}
+</style>

@@ -16,7 +16,7 @@ export default function fun() {
     }
     const flag = true
     if (flag) {
-        const op = 777*333 * 999 + 555;
+        const op = 88 * 44 + 22 + 11 * 66 + 77; 
     }else{
 
     }
@@ -25,11 +25,11 @@ export default function fun() {
     `;
 
     const astP = template.ast(code)
-    // console.log("####", JSON.stringify(astP, null, 2), "#####")
+    console.log("####", JSON.stringify(astP, null, 2), "#####")
 
 
     const ast = parse(code)
-    // console.log("####", JSON.stringify(ast, null, 2), "#####")
+    console.log("####", JSON.stringify(ast, null, 2), "#####")
 
 
     traverse(ast, {

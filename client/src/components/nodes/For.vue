@@ -41,10 +41,10 @@ export default defineComponent({
     },
 })
 </script>
-
+//TODO: change df to nodes
 <template>
     <div ref="el">
-        <NodeHeader title="For" />//TODO: change df to nodes
-        <el-input-number v-model="num" :controls="false" df-for />
+        <NodeHeader title="For" />
+        <!-- <el-input-number v-model="num" :controls="false" df-for /> -->
     </div>
 </template>

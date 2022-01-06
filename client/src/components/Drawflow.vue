@@ -50,9 +50,11 @@ import NodeSub from './nodes/Subtraction.vue'
 import NodeMult from './nodes/Multiplication.vue'
 import NodeDiv from './nodes/Division.vue'
 import NodeAssign from './nodes/Assign.vue'
+import NodeFor from './nodes/For.vue'
 import store from '../store'
 import { checkConnections } from '../modules/constraints'
 import { stopWatch } from '../helpers/stopWatch'
+import { transformToAST } from '../modules/transformToAST'
 
 
 export default {
@@ -63,12 +65,12 @@ export default {
                 name: 'Number',
                 color: '#49494970',
                 item: 'Num',
-                input: 0,
+                input: 1,
                 output: 1,
                 data: {
                     num: 0,
                 },
-                class: "number",
+                class: "NumericLiteral",
             },
             {
                 name: 'Add',
@@ -78,8 +80,9 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
+                    operator: '+',
                 },
-                class: "ops",
+                class: "BinaryExpression",
             },
             {
                 name: 'Subtraction',
@@ -89,8 +92,9 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
+                    operator: '-',
                 },
-                class: "ops",
+                class: "BinaryExpression",
             },
             {
                 name: 'Multiplication',
@@ -100,8 +104,9 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
+                    operator: '*',
                 },
-                class: "ops",
+                class: "BinaryExpression",
             },
             {
                 name: 'Division',
@@ -111,8 +116,10 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
+                    operator: '/',
+
                 },
-                class: "ops",
+                class: "BinaryExpression",
             },
             {
                 name: 'Assign',
@@ -123,7 +130,27 @@ export default {
                 data: {
                     num: 0,
                 },
-                class: "assign",
+                class: "VariableDeclarator",
+            },
+            {
+                name: 'For',
+                color: '#49433440',
+                item: 'For',
+                input: 2,
+                output: 1,
+                data: {
+                    operator: '<',
+                },
+                class: "ForStatement",
+            },
+            {
+                name: 'Block',
+                color: '#49433440',
+                item: 'Block',
+                input: 1,
+                output: 1,
+                data: {},
+                class: "BlockStatement",
             },
         ])
 
@@ -136,6 +163,7 @@ export default {
 
         function exportEditor() {
             dialogData.value = editor.value.export();
+            transformToAST(dialogData.value.drawflow.Home.data)
             dialogVisible.value = true;
         }
 
@@ -172,6 +200,7 @@ export default {
             editor.value.registerNode('Mult', NodeMult, {}, {});
             editor.value.registerNode('Div', NodeDiv, {}, {});
             editor.value.registerNode('Assign', NodeAssign, {}, {});
+            editor.value.registerNode('For', NodeFor, {}, {});
 
             editor.value.on('nodeRemoved', (id) => {
                 stopWatch(id);

@@ -18,6 +18,7 @@ export default defineComponent({
         const sharedState = reactive(store.state)
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
+        //TODO: fix reactivity chain
         // check if the value of its input changed
         const stop = watch(sharedState, async () => {
             await nextTick()

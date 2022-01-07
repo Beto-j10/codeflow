@@ -1,48 +1,8 @@
-<template>
-    <el-container>
-        <el-header class="header">
-            <h3>CodeFlow</h3>
-            <el-button type="primary" @click="exportEditor">Export</el-button>
-        </el-header>
-        <el-container class="container">
-            <el-aside width="150px" class="column">
-                <ul>
-                    <li
-                        v-for="n in listNodes"
-                        :key="n"
-                        draggable="true"
-                        :data-node="n.item"
-                        @dragstart="drag($event)"
-                    >
-                        <div class="node" :style="`background: ${n.color}`">{{ n.name }}</div>
-                    </li>
-                </ul>
-            </el-aside>
-            <el-main>
-                <div
-                    id="drawflow"
-                    @drop.prevent="drop($event)"
-                    @dragover.prevent="allowDrop($event)"
-                ></div>
-            </el-main>
-        </el-container>
-    </el-container>
-    <el-dialog v-model="dialogVisible" title="Export" width="50%">
-        <span>Data:</span>
-        <pre><code>{{ dialogData }}</code></pre>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
-            </span>
-        </template>
-    </el-dialog>
-</template>
 <script>
 
 import Drawflow from 'drawflow'
-import styleDrawflow from 'drawflow/dist/drawflow.min.css'
-import style from '../assets/style.css'
+import 'drawflow/dist/drawflow.min.css'
+import '../styles/drawflow.css'
 import { onMounted, shallowRef, h, getCurrentInstance, render, readonly, ref, nextTick } from 'vue'
 import Number from './nodes/Number.vue'
 import NodeAdd from './nodes/Add.vue'
@@ -51,6 +11,8 @@ import NodeMult from './nodes/Multiplication.vue'
 import NodeDiv from './nodes/Division.vue'
 import NodeAssign from './nodes/Assign.vue'
 import NodeFor from './nodes/For.vue'
+import NodeBlock from './nodes/Block.vue'
+
 import store from '../store'
 import { checkConnections } from '../modules/constraints'
 import { stopWatch } from '../helpers/stopWatch'
@@ -136,7 +98,7 @@ export default {
                 name: 'For',
                 color: '#49433440',
                 item: 'For',
-                input: 2,
+                input: 3,
                 output: 1,
                 data: {
                     operator: '<',
@@ -147,7 +109,7 @@ export default {
                 name: 'Block',
                 color: '#49433440',
                 item: 'Block',
-                input: 1,
+                input: 0,
                 output: 1,
                 data: {},
                 class: "BlockStatement",
@@ -201,6 +163,7 @@ export default {
             editor.value.registerNode('Div', NodeDiv, {}, {});
             editor.value.registerNode('Assign', NodeAssign, {}, {});
             editor.value.registerNode('For', NodeFor, {}, {});
+            editor.value.registerNode('Block', NodeBlock, {}, {});
 
             editor.value.on('nodeRemoved', (id) => {
                 stopWatch(id);
@@ -297,6 +260,48 @@ export default {
 }
 
 </script>
+
+<template>
+    <el-container>
+        <el-header class="header">
+            <h3>CodeFlow</h3>
+            <el-button type="primary" @click="exportEditor">Export</el-button>
+        </el-header>
+        <el-container class="container">
+            <el-aside width="150px" class="column">
+                <ul>
+                    <li
+                        v-for="n in listNodes"
+                        :key="n"
+                        draggable="true"
+                        :data-node="n.item"
+                        @dragstart="drag($event)"
+                    >
+                        <div class="node" :style="`background: ${n.color}`">{{ n.name }}</div>
+                    </li>
+                </ul>
+            </el-aside>
+            <el-main>
+                <div
+                    id="drawflow"
+                    @drop.prevent="drop($event)"
+                    @dragover.prevent="allowDrop($event)"
+                ></div>
+            </el-main>
+        </el-container>
+    </el-container>
+    <el-dialog v-model="dialogVisible" title="Export" width="50%">
+        <span>Data:</span>
+        <pre><code>{{ dialogData }}</code></pre>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+            </span>
+        </template>
+    </el-dialog>
+</template>
+
 <style scoped>
 .header {
     display: flex;
@@ -333,8 +338,8 @@ export default {
     width: 100%;
     height: 100%;
     text-align: initial;
-    background: #2b2c30;
+    /* background: #2b2c30;
     background-size: 20px 20px;
-    background-image: radial-gradient(#494949 1px, transparent 1px);
+    background-image: radial-gradient(#494949 1px, transparent 1px); */
 }
 </style>

@@ -3,7 +3,7 @@ import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, r
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { registerStop } from '../../helpers/stopWatch';
-import { forStructure } from '../../modules/controlStructure';
+// import { forStructure } from '../../modules/controlStructure';
 
 export default defineComponent({
     components: {
@@ -20,7 +20,7 @@ export default defineComponent({
 
         // check if the value of one of its inputs changed
         const stop = watch(sharedState, () => {
-            forStructure(df, nodeId.value)
+            // forStructure(df, nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
         })

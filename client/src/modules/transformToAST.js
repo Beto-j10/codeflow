@@ -66,10 +66,11 @@ function transformNode(node, preAST) {
                     operator: "++", //to implement
                     value: node.inputs.input_3.connections.at(0).node,
                 },
-                body: {
-                    type: "BlockStatement",
-                    body: []
-                }
+                body: node.outputs.output_1.connections.at(0).node,
+                // body: {
+                //     type: "BlockStatement",
+                //     body: []
+                // }
             }
             break;
 
@@ -80,6 +81,9 @@ function transformNode(node, preAST) {
 
 function bindingNodes(node, preAST, nonRootNodes) {
     switch (node.type) {
+        case "NumericLiteral":
+
+            break;
         case "BinaryExpression":
 
             nonRootNodes[node.left] = ""
@@ -94,6 +98,12 @@ function bindingNodes(node, preAST, nonRootNodes) {
             nonRootNodes[node.init] = ""
 
             node.init = preAST[node.init]
+            break;
+        case "ForStatement":
+
+            nonRootNodes[node.body] = ""
+
+            node.body = preAST[node.body]
             break;
 
         default:

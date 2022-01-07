@@ -39,11 +39,7 @@
 }
 
 .drawflow .connection .main-path:hover {
-    stroke: rgb(250, 0, 250);
-}
-
-.main-path.selected {
-    stroke: rgb(250, 0, 175) !important;
+    stroke: rgb(250, 0, 175);
 }
 
 .parent-node .drawflow-delete {

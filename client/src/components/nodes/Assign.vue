@@ -66,7 +66,7 @@ export default defineComponent({
 .assign__text {
     display: block;
     margin: 0 auto;
-    color: #fff;
+    color: #555;
     text-align: center;
     font-size: 1.2rem;
 }

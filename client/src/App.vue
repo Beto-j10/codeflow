@@ -10,34 +10,37 @@ import Drawflow from './components/Drawflow.vue'
 </template>
 
 <style>
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
 *,
 :after,
 :before {
   box-sizing: border-box;
-  margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-html {
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  background: transparent;
-}
-body {
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 40px);
-  margin: 10px;
-  padding: 0;
-  background: #181818;
-  color: #f7f7f7;
 }
 
-#app {
-  margin: 0px;
-  border-radius: 8px;
-  border: 1px solid #494949;
+html {
+  font-size: 62.5%;
 }
-.el-main {
-  padding: 0;
+
+html, body, #app {
+  height: 100%;
 }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.6rem;
+  color: #1b1b1b;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}
+
 </style>

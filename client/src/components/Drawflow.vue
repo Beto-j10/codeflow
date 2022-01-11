@@ -262,34 +262,30 @@ export default {
 </script>
 
 <template>
-    <el-container>
-        <el-header class="header">
+    <div class="codeflow">
+        <header class="header">
             <h3>CodeFlow</h3>
             <el-button type="primary" @click="exportEditor">Export</el-button>
-        </el-header>
-        <el-container class="container">
-            <el-aside width="150px" class="column">
-                <ul>
-                    <li
-                        v-for="n in listNodes"
-                        :key="n"
-                        draggable="true"
-                        :data-node="n.item"
-                        @dragstart="drag($event)"
-                    >
-                        <div class="node" :style="`background: ${n.color}`">{{ n.name }}</div>
-                    </li>
-                </ul>
-            </el-aside>
-            <el-main>
-                <div
-                    id="drawflow"
-                    @drop.prevent="drop($event)"
-                    @dragover.prevent="allowDrop($event)"
-                ></div>
-            </el-main>
-        </el-container>
-    </el-container>
+        </header>
+        <aside class="sidebar">
+            <ul class="list">
+                <li
+                    class="list__item"
+                    v-for="n in listNodes"
+                    :key="n"
+                    draggable="true"
+                    :data-node="n.item"
+                    @dragstart="drag($event)"
+                >
+                    <!-- <div class="list__node" :style="`background: ${n.color}`">{{ n.name }}</div> -->
+                    <div class="list__node">{{ n.name }}</div>
+                </li>
+            </ul>
+        </aside>
+        <main class="main">
+            <div id="drawflow" @drop.prevent="drop($event)" @dragover.prevent="allowDrop($event)"></div>
+        </main>
+    </div>
     <el-dialog v-model="dialogVisible" title="Export" width="50%">
         <span>Data:</span>
         <pre><code>{{ dialogData }}</code></pre>
@@ -303,7 +299,47 @@ export default {
 </template>
 
 <style scoped>
+
+.codeflow {
+    display: grid;
+    grid-template-columns: 15% 1fr;
+    grid-template-rows: 1fr 4fr;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+}
+
 .header {
+    grid-area: header;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar {
+    grid-area: sidebar;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.main {
+    grid-area: main;
+    padding: 0;
+}
+/* .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -333,7 +369,7 @@ export default {
     padding: 10px;
     margin: 10px 0px;
     cursor: move;
-}
+} */
 #drawflow {
     width: 100%;
     height: 100%;

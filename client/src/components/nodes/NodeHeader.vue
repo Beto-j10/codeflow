@@ -13,7 +13,7 @@ export default ({
 
 <style scoped>
 .header {
-    background: #494949;
+    background: #f6f6f6;
     margin-top: -15px;
     margin-left: -15px;
     margin-right: -15px;

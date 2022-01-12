@@ -3,11 +3,13 @@ import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, r
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { registerStop } from '../../helpers/stopWatch';
+import Node from '../layouts/Node.vue';
 // import { forStructure } from '../../modules/controlStructure';
 
 export default defineComponent({
     components: {
-        NodeHeader
+        NodeHeader,
+        Node
     },
     setup() {
         const el = ref(null);
@@ -44,7 +46,7 @@ export default defineComponent({
 //TODO: change df to nodes
 <template>
     <div ref="el">
-        <NodeHeader title="For" />
+        <Node node-title="For" is-empty></Node>
         <!-- <el-input-number v-model="num" :controls="false" df-for /> -->
     </div>
 </template>

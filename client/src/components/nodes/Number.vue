@@ -2,10 +2,12 @@
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick } from 'vue';
 import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
+import Node from '../layouts/Node.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader
+        NodeHeader,
+        Node
     },
     data() {
         return {
@@ -44,7 +46,8 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <NodeHeader title="Number" />
-        <el-input-number v-model="num" :controls="false" @change="handleChange" df-num />
+        <Node node-title="Number">
+            <el-input-number v-model="num" :controls="false" @change="handleChange" df-num />
+        </Node>
     </div>
 </template>

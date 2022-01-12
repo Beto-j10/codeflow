@@ -4,10 +4,12 @@ import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { division } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
+import Node from '../layouts/Node.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader
+        NodeHeader,
+        Node
     },
     setup() {
         const el = ref(null);
@@ -48,7 +50,8 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <NodeHeader title="Division" />
-        <el-input-number v-model="num" :controls="false" df-num />
+        <Node node-title="Division">
+            <el-input-number v-model="num" :controls="false" df-num />
+        </Node>
     </div>
 </template>

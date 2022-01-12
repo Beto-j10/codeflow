@@ -13,11 +13,6 @@ export default ({
 
 <style scoped>
 .header {
-    background: #f6f6f6;
-    margin-top: -15px;
-    margin-left: -15px;
-    margin-right: -15px;
-    padding: 10px 15px;
-    margin-bottom: 15px;
+    background: var(--bg-color-secondary);
 }
 </style>

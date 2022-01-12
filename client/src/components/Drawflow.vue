@@ -264,7 +264,7 @@ export default {
 <template>
     <div class="codeflow">
         <header class="header">
-            <h3>CodeFlow</h3>
+            <h3 class="header__title">CodeFlow</h3>
             <el-button type="primary" @click="exportEditor">Export</el-button>
         </header>
         <aside class="sidebar">
@@ -299,14 +299,14 @@ export default {
 </template>
 
 <style scoped>
-
 .codeflow {
     display: grid;
-    grid-template-columns: 15% 1fr;
-    grid-template-rows: 1fr 4fr;
+    grid-template-columns: 180px 1fr;
+    grid-template-rows: 48px 4fr;
     grid-template-areas:
         "header header"
         "sidebar main";
+        height: 100%;
 }
 
 .header {
@@ -314,6 +314,12 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 var(--container-padding);
+    border-bottom: 1px solid var(--border-color-dark);
+}
+
+.header__title {
+    font-size: 2.4rem;
 }
 
 .sidebar {
@@ -324,58 +330,23 @@ export default {
     list-style: none;
     padding: 0;
     margin: 0;
+    border-right: 1px solid var(--border-color-dark);
 }
 
 .list__item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
-    border-bottom: 1px solid #ccc;
-    cursor: pointer;
+    border-bottom: 1px solid var(--border-color-dark);
+    cursor: move;
+    padding: 12px 12px 12px var(--container-padding);
 }
 
 .main {
     grid-area: main;
     padding: 0;
 }
-/* .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #494949;
-}
-.container {
-    min-height: calc(100vh - 100px);
-}
-.column {
-    border-right: 1px solid #494949;
-}
-.column ul {
-    padding-inline-start: 0px;
-    padding: 10px 10px;
-    list-style: none;
-}
-.column li {
-    background: transparent;
-}
 
-.node {
-    border-radius: 8px;
-    border: 2px solid #494949;
-    display: block;
-    height: 60px;
-    line-height: 40px;
-    padding: 10px;
-    margin: 10px 0px;
-    cursor: move;
-} */
 #drawflow {
     width: 100%;
     height: 100%;
     text-align: initial;
-    /* background: #2b2c30;
-    background-size: 20px 20px;
-    background-image: radial-gradient(#494949 1px, transparent 1px); */
 }
 </style>

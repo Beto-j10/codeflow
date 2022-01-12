@@ -4,10 +4,12 @@ import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { assign } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
+import Node from '../Node.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader
+        NodeHeader,
+        Node
     },
     setup() {
         const el = ref(null);
@@ -45,12 +47,12 @@ export default defineComponent({
 </script>
 //TODO: change Component
 <template>
-    <div ref="el" class="assign">
-        <NodeHeader title="Assign" />
-        <!-- <el-input-number v-model="num" :controls="false" df-num /> -->
-        <div class="assign__container">
-            <span class="assign__text">{{ num }}</span>
-        </div>
+    <div ref="el">
+        <Node node-title="Assign">
+            <div class="assign__container">
+                <span class="assign__text">{{ num }}</span>
+            </div>
+        </Node>
     </div>
 </template>
 

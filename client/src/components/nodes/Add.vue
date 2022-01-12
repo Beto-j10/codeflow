@@ -1,13 +1,13 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
-import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { add } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
+import Node from '../Node.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader
+        Node
     },
     setup() {
         const el = ref(null);
@@ -33,7 +33,6 @@ export default defineComponent({
 
             registerStop(nodeId.value, stop)
         });
-
         return {
             el,
             num,
@@ -44,7 +43,8 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <NodeHeader title="Addition" />
-        <el-input-number v-model="num" :controls="false" df-num />
+        <Node node-title="Addition">
+            <el-input-number v-model="num" :controls="false" />
+        </Node>
     </div>
 </template>

@@ -1,16 +1,16 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import NodeHeader from './NodeHeader.vue';
+import Node from '../Node.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader
-    },
+    NodeHeader,
+    Node
+},
 })
 </script>
 //TODO: change Component
 <template>
-    <div>
-        <NodeHeader title="BlockStatement" />
-    </div>
+    <Node node-title="BlockStatement"></Node>
 </template>

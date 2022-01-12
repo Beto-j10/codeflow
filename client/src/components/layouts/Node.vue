@@ -1,12 +1,9 @@
 <script>
-import NodeHeader from "./nodes/NodeHeader.vue";
 
 export default {
-    components: {
-        NodeHeader
-    },
     props: {
         nodeTitle: String,
+        isEmpty: Boolean,
     },
 }
 
@@ -16,8 +13,7 @@ export default {
 <template>
     <div class="node">
         <div class="node__title">{{ nodeTitle }}</div>
-        {{refEl}}
-        <div class="node__container">
+        <div :class="{node__container: !isEmpty}">
             <slot></slot>
         </div>
     </div>

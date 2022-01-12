@@ -17,16 +17,17 @@ import store from '../store'
 import { checkConnections } from '../modules/constraints'
 import { stopWatch } from '../helpers/stopWatch'
 import { transformToAST } from '../modules/transformToAST'
+import BaseLayout from './layouts/BaseLayout.vue'
 
 
 export default {
-    name: 'drawflow',
+    name: "drawflow",
     setup() {
         const listNodes = readonly([
             {
-                name: 'Number',
-                color: '#49494970',
-                item: 'Num',
+                name: "Number",
+                color: "#49494970",
+                item: "Num",
                 input: 1,
                 output: 1,
                 data: {
@@ -35,58 +36,57 @@ export default {
                 class: "NumericLiteral",
             },
             {
-                name: 'Add',
-                color: '#49433440',
-                item: 'Add',
+                name: "Add",
+                color: "#49433440",
+                item: "Add",
                 input: 2,
                 output: 1,
                 data: {
                     num: 0,
-                    operator: '+',
+                    operator: "+",
                 },
                 class: "BinaryExpression",
             },
             {
-                name: 'Subtraction',
-                color: '#49433440',
-                item: 'Sub',
+                name: "Subtraction",
+                color: "#49433440",
+                item: "Sub",
                 input: 2,
                 output: 1,
                 data: {
                     num: 0,
-                    operator: '-',
+                    operator: "-",
                 },
                 class: "BinaryExpression",
             },
             {
-                name: 'Multiplication',
-                color: '#49433440',
-                item: 'Mult',
+                name: "Multiplication",
+                color: "#49433440",
+                item: "Mult",
                 input: 2,
                 output: 1,
                 data: {
                     num: 0,
-                    operator: '*',
+                    operator: "*",
                 },
                 class: "BinaryExpression",
             },
             {
-                name: 'Division',
-                color: '#49433440',
-                item: 'Div',
+                name: "Division",
+                color: "#49433440",
+                item: "Div",
                 input: 2,
                 output: 1,
                 data: {
                     num: 0,
-                    operator: '/',
-
+                    operator: "/",
                 },
                 class: "BinaryExpression",
             },
             {
-                name: 'Assign',
-                color: '#49433440',
-                item: 'Assign',
+                name: "Assign",
+                color: "#49433440",
+                item: "Assign",
                 input: 1,
                 output: 1,
                 data: {
@@ -95,90 +95,75 @@ export default {
                 class: "VariableDeclarator",
             },
             {
-                name: 'For',
-                color: '#49433440',
-                item: 'For',
+                name: "For",
+                color: "#49433440",
+                item: "For",
                 input: 3,
                 output: 1,
                 data: {
-                    operator: '<',
+                    operator: "<",
                 },
                 class: "ForStatement",
             },
             {
-                name: 'Block',
-                color: '#49433440',
-                item: 'Block',
+                name: "Block",
+                color: "#49433440",
+                item: "Block",
                 input: 0,
                 output: 1,
                 data: {},
                 class: "BlockStatement",
             },
-        ])
-
-        const editor = shallowRef({})
-        const dialogVisible = ref(false)
-        const dialogData = ref({})
+        ]);
+        const editor = shallowRef({});
+        const dialogVisible = ref(false);
+        const dialogData = ref({});
         const Vue = { version: 3, h, render };
-        const internalInstance = getCurrentInstance()
+        const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
-
         function exportEditor() {
             dialogData.value = editor.value.export();
-            transformToAST(dialogData.value.drawflow.Home.data)
+            transformToAST(dialogData.value.drawflow.Home.data);
             dialogVisible.value = true;
         }
-
         const drag = (ev) => {
-            ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
-        }
+            ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
+        };
         const drop = (ev) => {
             var data = ev.dataTransfer.getData("node");
             addNodeToDrawFlow(data, ev.clientX, ev.clientY);
-
-        }
+        };
         const allowDrop = (ev) => {
-        }
-
+        };
         function addNodeToDrawFlow(name, pos_x, pos_y) {
             pos_x = pos_x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().x * (editor.value.precanvas.clientWidth / (editor.value.precanvas.clientWidth * editor.value.zoom)));
             pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
-
             const nodeSelected = listNodes.find(ele => ele.item == name);
-            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, nodeSelected.class, nodeSelected.data, name, 'vue');
-
+            editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, nodeSelected.class, nodeSelected.data, name, "vue");
         }
-
-
         onMounted(() => {
-
             const id = document.getElementById("drawflow");
             editor.value = new Drawflow(id, Vue, internalInstance.appContext.app._context);
             editor.value.start();
-
-            editor.value.registerNode('Num', Number, {}, {});
-            editor.value.registerNode('Add', NodeAdd, {}, {});
-            editor.value.registerNode('Sub', NodeSub, {}, {});
-            editor.value.registerNode('Mult', NodeMult, {}, {});
-            editor.value.registerNode('Div', NodeDiv, {}, {});
-            editor.value.registerNode('Assign', NodeAssign, {}, {});
-            editor.value.registerNode('For', NodeFor, {}, {});
-            editor.value.registerNode('Block', NodeBlock, {}, {});
-
-            editor.value.on('nodeRemoved', (id) => {
+            editor.value.registerNode("Num", Number, {}, {});
+            editor.value.registerNode("Add", NodeAdd, {}, {});
+            editor.value.registerNode("Sub", NodeSub, {}, {});
+            editor.value.registerNode("Mult", NodeMult, {}, {});
+            editor.value.registerNode("Div", NodeDiv, {}, {});
+            editor.value.registerNode("Assign", NodeAssign, {}, {});
+            editor.value.registerNode("For", NodeFor, {}, {});
+            editor.value.registerNode("Block", NodeBlock, {}, {});
+            editor.value.on("nodeRemoved", (id) => {
                 stopWatch(id);
             });
-
-            editor.value.on('connectionCreated', (ids) => {
+            editor.value.on("connectionCreated", (ids) => {
                 checkConnections(ids, editor.value);
-                store.updateState()
+                store.updateState();
             });
-
-            editor.value.on('connectionRemoved', async () => {
-                await nextTick()
-                store.updateState()
+            editor.value.on("connectionRemoved", async () => {
+                await nextTick();
+                store.updateState();
             });
-
             // editor.value.import(
             //     {
             //         "drawflow": {
@@ -197,7 +182,6 @@ export default {
             //                             "input_1": {
             //                                 "connections": [
             //         I have data that I want to write to a file, and open a file dialog for the user to choose where to save the file. It would be great if it worked in all browsers, but it has to work in Chrome. I want to do this all client-side.
-
             //                                         "node": "6",
             //                                         "input": "output_1"
             //                                     }
@@ -207,12 +191,10 @@ export default {
             //                         "outputs": {
             //                             "output_1": {
             //                                 "connections": [
-
             //                                 ]
             //                             },
             //                             "output_2": {
             //                                 "connections": [
-
             //                                 ]
             //                             }
             //                         },
@@ -230,7 +212,6 @@ export default {
             //                         "html": "Node1",
             //                         "typenode": "vue",
             //                         "inputs": {
-
             //                         },
             //                         "outputs": {
             //                             "output_2": {
@@ -250,24 +231,30 @@ export default {
             //         }
             //     }
             // )
-        })
-
+        });
         return {
-            exportEditor, listNodes, drag, drop, allowDrop, dialogVisible, dialogData
-        }
-
-    }
+            exportEditor,
+            listNodes,
+            drag,
+            drop,
+            allowDrop,
+            dialogVisible,
+            dialogData
+        };
+    },
+    components: { BaseLayout }
 }
 
 </script>
 
 <template>
-    <div class="codeflow">
-        <header class="header">
-            <h3 class="header__title">CodeFlow</h3>
+    <BaseLayout>
+        <template #header>
+            <h3 class="title">CodeFlow</h3>
             <el-button type="primary" @click="exportEditor">Export</el-button>
-        </header>
-        <aside class="sidebar">
+        </template>
+
+        <template #sidebar>
             <ul class="list">
                 <li
                     class="list__item"
@@ -281,11 +268,13 @@ export default {
                     <div class="list__node">{{ n.name }}</div>
                 </li>
             </ul>
-        </aside>
-        <main class="main">
+        </template>
+
+        <template #main>
             <div id="drawflow" @drop.prevent="drop($event)" @dragover.prevent="allowDrop($event)"></div>
-        </main>
-    </div>
+        </template>
+    </BaseLayout>
+
     <el-dialog v-model="dialogVisible" title="Export" width="50%">
         <span>Data:</span>
         <pre><code>{{ dialogData }}</code></pre>
@@ -299,31 +288,8 @@ export default {
 </template>
 
 <style scoped>
-.codeflow {
-    display: grid;
-    grid-template-columns: 180px 1fr;
-    grid-template-rows: 48px 4fr;
-    grid-template-areas:
-        "header header"
-        "sidebar main";
-        height: 100%;
-}
-
-.header {
-    grid-area: header;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 var(--container-padding);
-    border-bottom: 1px solid var(--border-color-dark);
-}
-
-.header__title {
+.title {
     font-size: 2.4rem;
-}
-
-.sidebar {
-    grid-area: sidebar;
 }
 
 .list {
@@ -337,11 +303,6 @@ export default {
     border-bottom: 1px solid var(--border-color-dark);
     cursor: move;
     padding: 12px 12px 12px var(--container-padding);
-}
-
-.main {
-    grid-area: main;
-    padding: 0;
 }
 
 #drawflow {

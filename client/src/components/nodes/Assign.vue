@@ -4,7 +4,7 @@ import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { assign } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
-import Node from '../Node.vue';
+import Node from '../layouts/Node.vue';
 
 export default defineComponent({
     components: {

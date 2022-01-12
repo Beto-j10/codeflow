@@ -3,7 +3,7 @@ import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, r
 import store from '../../store';
 import { add } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
-import Node from '../Node.vue';
+import Node from '../layouts/Node.vue';
 
 export default defineComponent({
     components: {

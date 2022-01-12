@@ -1,7 +1,7 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import NodeHeader from './NodeHeader.vue';
-import Node from '../Node.vue';
+import Node from '../layouts/Node.vue';
 
 export default defineComponent({
     components: {
@@ -12,5 +12,5 @@ export default defineComponent({
 </script>
 //TODO: change Component
 <template>
-    <Node node-title="BlockStatement"></Node>
+    <Node node-title="BlockStatement" is-empty></Node>
 </template>

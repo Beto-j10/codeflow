@@ -13,6 +13,6 @@ export default ({
 
 <style scoped>
 .header {
-    background: var(--bg-color-secondary);
+    background: var(--bg-color-node-title);
 }
 </style>

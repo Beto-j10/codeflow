@@ -17,7 +17,7 @@ import Drawflow from './components/Drawflow.vue'
   --border-color-dark: #c1c1c1;
 
   --bg-color: #fafafa;
-  --bg-color-secondary: #f5f5f5;
+  --bg-color-node-title: #f1f1f1;
 
   --text-color-primary: #1b1b1b;
   --text-color-secondary: #545454;

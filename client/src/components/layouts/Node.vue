@@ -4,6 +4,7 @@ export default {
     props: {
         nodeTitle: String,
         isEmpty: Boolean,
+        nodeId: String,
     },
 }
 
@@ -23,10 +24,14 @@ export default {
 .nodeLayout__title {
     color: var(--text-color-primary);
     padding: 10px 12px;
+    margin-bottom: 8px;
     background-color: var(--bg-color-node-title);
     border-radius: var(--dfNodeBorderRadius) var(--dfNodeBorderRadius) 0 0;
+    order:  1;
+    width: 100%;
+    pointer-events: none;
 }
 .nodeLayout__container {
-    padding: 8px 12px 12px 12px;
+    margin: 8px 12px;
 }
 </style>

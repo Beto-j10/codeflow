@@ -123,9 +123,10 @@ export function division(df, nodeId) {
  * assigns the value of its input to the node value
  * @param {object} df 
  * @param {string} nodeId 
+ * @param {string} varName
  */
 
-export function assign(df, nodeId) {
+export function assign(df, nodeId, varName) {
 
     let nodeData = {}
     nodeData = df.getNodeFromId(nodeId)
@@ -140,5 +141,6 @@ export function assign(df, nodeId) {
     } else {
         nodeData.data.num = 0
     }
+    nodeData.data.var = varName
     df.updateNodeDataFromId(nodeId, nodeData.data);
 }

@@ -1,22 +1,24 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
-import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { assign } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
+import moveTitle from '../../helpers/moveTitle';
+import Input from '../Input.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader,
-        Node
-    },
+    Node,
+    Input
+},
     setup() {
         const el = ref(null);
         let df = null
         const nodeId = ref(0);
         const nodeData = ref({});
-        const num = ref(0)
+        const num = ref(0);
+        const varName = ref("")
         const sharedState = reactive(store.state)
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
@@ -24,9 +26,9 @@ export default defineComponent({
         // check if the value of its input changed
         const stop = watch(sharedState, async () => {
             await nextTick()
-            assign(df, nodeId.value)
-            nodeData.value = df.getNodeFromId(nodeId.value)
-            num.value = nodeData.value.data.num;
+            assign(df, nodeId.value, varName.value)
+            // nodeData.value = df.getNodeFromId(nodeId.value)
+            // num.value = nodeData.value.data.num;
         })
 
         onMounted(async () => {
@@ -34,13 +36,19 @@ export default defineComponent({
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
+            varName.value = `var${nodeId.value}`
+
+            nodeData.value.data.var = varName.value;
+            df.updateNodeDataFromId(nodeId.value, nodeData.value.data);
 
             registerStop(nodeId.value, stop)
+            moveTitle(nodeId.value)
         });
 
         return {
             el,
-            num,
+            // num,
+            varName,
         }
     },
 })
@@ -49,27 +57,13 @@ export default defineComponent({
 <template>
     <div ref="el">
         <Node node-title="Assign">
-            <div class="assign__container">
-                <span class="assign__text">{{ num }}</span>
-            </div>
+            <Input v-model="varName" type="text" readonly/>
         </Node>
     </div>
 </template>
 
 <style scoped>
-.assign__container {
-    /* background-color: #fff; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* width: 100%;
-    height: 100%; */
-}
-.assign__text {
-    display: block;
-    margin: 0 auto;
-    color: #555;
-    text-align: center;
-    font-size: 1.2rem;
-}
+    .hide {
+        display: none;
+    }
 </style>

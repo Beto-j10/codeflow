@@ -1,16 +1,17 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
-import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { multiplication } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
+import Input from '../Input.vue';
+import moveTitle from '../../helpers/moveTitle';
 
 export default defineComponent({
     components: {
-        NodeHeader,
-        Node
-    },
+    Node,
+    Input
+},
     setup() {
         const el = ref(null);
         let df = null
@@ -34,6 +35,7 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
 
             registerStop(nodeId.value, stop)
+            moveTitle(nodeId.value)
         });
 
         return {
@@ -46,8 +48,8 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <Node node-title="Multiplication">
-            <el-input-number v-model="num" :controls="false" df-num />
+        <Node node-title="Multiplication" width="150px">
+            <Input v-model.number="num" readonly />
         </Node>
     </div>
 </template>

@@ -28,10 +28,10 @@ export default {
                 name: "Number",
                 color: "#49494970",
                 item: "Num",
-                input: 1,
+                input: 0,
                 output: 1,
                 data: {
-                    num: 0,
+                    num: 0, // node initial value
                 },
                 class: "NumericLiteral",
             },
@@ -45,7 +45,7 @@ export default {
                     num: 0,
                     operator: "+",
                 },
-                class: "BinaryExpression",
+                class: "BinaryExpression Addition",
             },
             {
                 name: "Subtraction",
@@ -57,7 +57,7 @@ export default {
                     num: 0,
                     operator: "-",
                 },
-                class: "BinaryExpression",
+                class: "BinaryExpression Subtraction",
             },
             {
                 name: "Multiplication",
@@ -69,7 +69,7 @@ export default {
                     num: 0,
                     operator: "*",
                 },
-                class: "BinaryExpression",
+                class: "BinaryExpression Multiplication",
             },
             {
                 name: "Division",
@@ -81,7 +81,7 @@ export default {
                     num: 0,
                     operator: "/",
                 },
-                class: "BinaryExpression",
+                class: "BinaryExpression Division",
             },
             {
                 name: "Assign",
@@ -91,8 +91,9 @@ export default {
                 output: 1,
                 data: {
                     num: 0,
+                    var: "",
                 },
-                class: "VariableDeclarator",
+                class: "VariableDeclarator Assign",
             },
             {
                 name: "For",
@@ -310,4 +311,51 @@ export default {
     height: 100%;
     text-align: initial;
 }
+</style>
+
+<style>
+    #drawflow .ForStatement .input_1::after{
+        content: "From";
+    }
+    #drawflow .ForStatement .input_2::after{
+        content: "To";
+    }
+    #drawflow .ForStatement .input_3::after{
+        content: "Step";
+    }
+    #drawflow .ForStatement .output_1::before{
+        content: "Do";
+    }
+
+    #drawflow .BinaryExpression .input_1::after,
+    #drawflow .BinaryExpression .input_2::after,
+    #drawflow .Assign .input_1::after,
+    #drawflow .Assign .output_1::Before{
+        content: "Number";
+    }
+
+    #drawflow .BinaryExpression .output_1::before{
+        content: "Result";
+    }
+
+    /* #drawflow .Assign .input_1::after{
+        content: "Variable";
+    } */
+
+    #drawflow .Addition .input_1::before {
+        content: "+";
+    }
+
+    #drawflow .Subtraction .input_1::before {
+        content: "-";
+    }
+
+    #drawflow .Multiplication .input_1::before {
+        content: "*";
+    }
+
+    #drawflow .Division .input_1::before {
+        content: "÷";
+    }
+
 </style>

@@ -6,11 +6,12 @@
     --dfNodeFontSize       : var(--font-size-base);
     --dfNodeType           : flex;
     --dfNodeTypeFloat      : none;
+    --dfNodeFlexDirection  : column;
     --dfNodeBackgroundColor: var(--bg-color);
     --dfNodeTextColor      : var(--text-color-secondary);
     --dfNodeBorderSize     : 1px;
     --dfNodeBorderColor    : var(--border-color);
-    --dfNodeBorderRadius   : 4px;
+    --dfNodeBorderRadius   : 8px;
     --dfNodeMinHeight      : 40px;
     --dfNodeMinWidth       : 100px;
     --dfNodePaddingTop     : 10px;
@@ -25,7 +26,7 @@
     --dfNodeHoverTextColor      : var(--text-color-secondary);
     --dfNodeHoverBorderSize     : 1px;
     --dfNodeHoverBorderColor    : var(--border-color);
-    --dfNodeHoverBorderRadius   : 4px;
+    --dfNodeHoverBorderRadius   : 8px;
 
     --dfNodeHoverBoxShadowHL   : 0px;
     --dfNodeHoverBoxShadowVL   : 0px;
@@ -37,13 +38,20 @@
     --dfNodeSelectedTextColor      : var(--text-color-secondary);
     --dfNodeSelectedBorderSize     : 1px;
     --dfNodeSelectedBorderColor    : var(--border-color);
-    --dfNodeSelectedBorderRadius   : 4px;
+    --dfNodeSelectedBorderRadius   : 8px;
 
     --dfNodeSelectedBoxShadowHL   : 0px;
     --dfNodeSelectedBoxShadowVL   : 0px;
     --dfNodeSelectedBoxShadowBR   : 12px;
     --dfNodeSelectedBoxShadowS    : 2px;
     --dfNodeSelectedBoxShadowColor: var(--color-primary);
+
+    --dfConnectorNameTop          : -3px;
+    --dfConnectorNameSide         : 20px;
+    --dfConnectorSymbolTop        : 9px;
+    --dfConnectorSymbolLeft       : 65px;
+    --dfConnectorTypeFlexDirection: column;
+    --dfConnectorTypeGap          : 4px;
 
     --dfInputBackgroundColor: var(--bg-color);
     --dfInputBorderSize     : 2px;
@@ -71,10 +79,10 @@
     --dfOutputHoverBorderColor    : var(--border-color);
     --dfOutputHoverBorderRadius   : 50px;
 
-    --dfLineWidth        : 3px;
-    --dfLineColor        : #4fa8ff;
-    --dfLineHoverColor   : #1e74ff;
-    --dfLineSelectedColor: #0058e4;
+    --dfLineWidth           : 3px;
+    --dfLineColor           : #4fa8ff;
+    --dfLineHoverColor      : #1e74ff;
+    --dfLineSelectedColor   : #0058e4;
     /* --dfLineSelectedColor: #0015ff; */
 
     --dfRerouteBorderWidth    : 2px;
@@ -110,16 +118,17 @@
 .drawflow .drawflow-node {
     font-size         : var(--dfNodeFontSize);
     display           : var(--dfNodeType);
+    flex-direction    : var(--dfNodeFlexDirection);
     background        : var(--dfNodeBackgroundColor);
     color             : var(--dfNodeTextColor);
     border            : var(--dfNodeBorderSize) solid var(--dfNodeBorderColor);
     border-radius     : var(--dfNodeBorderRadius);
     min-height        : var(--dfNodeMinHeight);
-    width             : auto;
+    width             : min-content;
     min-width         : var(--dfNodeMinWidth);
-    /* padding-top       : var(--dfNodePaddingTop); */
-    /* padding-bottom    : var(--dfNodePaddingBottom); */
-    padding: 0;
+    padding           : 0;
+    padding-top       : var(--dfNodePaddingTop);
+    padding-bottom    : var(--dfNodePaddingBottom);
     -webkit-box-shadow: var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL) var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
     box-shadow        : var(--dfNodeBoxShadowHL) var(--dfNodeBoxShadowVL) var(--dfNodeBoxShadowBR) var(--dfNodeBoxShadowS) var(--dfNodeBoxShadowColor);
 }
@@ -142,6 +151,10 @@
     box-shadow        : var(--dfNodeSelectedBoxShadowHL) var(--dfNodeSelectedBoxShadowVL) var(--dfNodeSelectedBoxShadowBR) var(--dfNodeSelectedBoxShadowS) var(--dfNodeSelectedBoxShadowColor);
 }
 
+.drawflow .drawflow_content_node {
+    order: 3;
+}
+
 .drawflow .drawflow-node .input {
     /* left         : var(--dfInputLeft); */
     left         : calc(var(--dfInputHeight) / -2);
@@ -158,8 +171,48 @@
     border-radius: var(--dfInputHoverBorderRadius);
 }
 
+.drawflow .drawflow-node .inputs,
 .drawflow .drawflow-node .outputs {
-    float: var(--dfNodeTypeFloat);
+    /* float: var(--dfNodeTypeFloat); */
+    display       : flex;
+    flex-direction: var(--dfConnectorTypeFlexDirection);
+    gap           : var(--dfConnectorTypeGap);
+    font-size     : var(--font-size-xx-small);
+    color         : var(--text-color-tertiary);
+}
+
+.drawflow .drawflow-node .inputs {
+    order     : 4;
+    align-self: flex-start;
+}
+
+.drawflow .drawflow-node .input::after {
+    content     : "";
+    position    : absolute;
+    top         : var(--dfConnectorNameTop);
+    padding-left: var(--dfConnectorNameSide);
+}
+
+.drawflow .drawflow-node .input::before {
+    content       : "";
+    position      : absolute;
+    top           : var(--dfConnectorSymbolTop);
+    left          : var(--dfConnectorSymbolLeft);
+    pointer-events: none;
+    font-size: var(--font-size-base);
+}
+
+.drawflow .drawflow-node .output::before {
+    content      : "";
+    position     : absolute;
+    top          : var(--dfConnectorNameTop);
+    padding-right: var(--dfConnectorNameSide);
+    right        : 0;
+}
+
+.drawflow .drawflow-node .outputs {
+    order     : 2;
+    align-self: flex-end;
 }
 
 .drawflow .drawflow-node .output {

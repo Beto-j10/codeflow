@@ -3,11 +3,14 @@ import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, r
 import store from '../../store';
 import { add } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
+import moveTitle from '../../helpers/moveTitle';
 import Node from '../layouts/Node.vue';
+import Input from '../Input.vue';
 
 export default defineComponent({
     components: {
-        Node
+        Node,
+        Input
     },
     setup() {
         const el = ref(null);
@@ -32,6 +35,7 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
 
             registerStop(nodeId.value, stop)
+            moveTitle(nodeId.value)
         });
         return {
             el,
@@ -43,8 +47,8 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <Node node-title="Addition">
-            <el-input-number v-model="num" :controls="false" />
+        <Node node-title="Addition" width="150px">
+            <Input v-model.number="num" readonly />
         </Node>
     </div>
 </template>

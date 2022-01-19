@@ -1,15 +1,16 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
-import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { subtraction } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
+import moveTitle from '../../helpers/moveTitle';
+import Input from '../Input.vue';
 
 export default defineComponent({
     components: {
-        NodeHeader,
-        Node
+        Node,
+        Input
     },
     setup() {
         const el = ref(null);
@@ -35,6 +36,7 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
 
             registerStop(nodeId.value, stop)
+            moveTitle(nodeId.value)
         });
 
         return {
@@ -47,8 +49,8 @@ export default defineComponent({
 
 <template>
     <div ref="el">
-        <Node node-title="Subtraction">
-            <el-input-number v-model="num" :controls="false" df-num />
+        <Node node-title="Subtraction" width="150px">
+            <Input v-model.number="num" readonly />
         </Node>
     </div>
 </template>

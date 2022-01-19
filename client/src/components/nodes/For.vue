@@ -1,14 +1,13 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
-import NodeHeader from './NodeHeader.vue';
 import store from '../../store';
 import { registerStop } from '../../helpers/stopWatch';
+import moveTitle from '../../helpers/moveTitle';
 import Node from '../layouts/Node.vue';
 // import { forStructure } from '../../modules/controlStructure';
 
 export default defineComponent({
     components: {
-        NodeHeader,
         Node
     },
     setup() {
@@ -34,6 +33,7 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
 
             registerStop(nodeId.value, stop)
+            moveTitle(nodeId.value)
         });
 
         return {
@@ -46,7 +46,6 @@ export default defineComponent({
 //TODO: change df to nodes
 <template>
     <div ref="el">
-        <Node node-title="For" is-empty></Node>
-        <!-- <el-input-number v-model="num" :controls="false" df-for /> -->
+        <Node node-title="For" is-empty width="120px"></Node>
     </div>
 </template>

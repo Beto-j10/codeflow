@@ -4,7 +4,7 @@ export default {
     props: {
         nodeTitle: String,
         isEmpty: Boolean,
-        nodeId: String,
+        width: String,
     },
 }
 
@@ -13,8 +13,8 @@ export default {
 
 <template>
     <div class="nodeLayout">
-        <div class="nodeLayout__title">{{ nodeTitle }}</div>
-        <div :class="{ nodeLayout__container: !isEmpty }">
+        <div class="nodeLayout__title" :style="{width: width}">{{ nodeTitle }}</div>
+        <div v-if="!isEmpty" class="nodeLayout__container">
             <slot></slot>
         </div>
     </div>
@@ -22,15 +22,15 @@ export default {
 
 <style scoped>
 .nodeLayout__title {
-    color: var(--text-color-primary);
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    background-color: var(--bg-color-node-title);
+    color: var(--text-color-secondary);
+    padding: 0 12px 4px;
+    background-color: var(--bg-color);
     border-radius: var(--dfNodeBorderRadius) var(--dfNodeBorderRadius) 0 0;
-    order:  1;
+    order: 1;
     width: 100%;
     pointer-events: none;
 }
+
 .nodeLayout__container {
     margin: 8px 12px;
 }

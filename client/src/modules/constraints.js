@@ -1,3 +1,5 @@
+import store from "../store"
+
 export function checkConnections(ids, editor) {
     // console.log("ids: ", ids)
     // console.log("Editor: ", editor)
@@ -17,5 +19,13 @@ export function checkConnections(ids, editor) {
 }
 
 export function checkAssigment(df) {
+
+}
+
+export function checkNodeRemoved(id, editor) {
+    const nodeData = editor.getNodeFromId(id)
+    if (nodeData.class === "forStatement") {
+        store.deleteVar(id)
+    }
 
 }

@@ -1,12 +1,18 @@
 :root {
     --color-primary: #4ea9ff;
+    --color-primary-light: #54adff;
+    --color-primary-dark: #409EFF;
+    --color-white: #fff;
 
     --border-color     : #cacaca;
+    --border-color-light: #d6d6d6;
     --border-color-dark: #c1c1c1;
     --border-radius-input: 14px;
 
     --bg-color           : #fafafa;
     --bg-color-node-title: #f1f1f1;
+
+    --scrollbar-color-thumb: #cacaca;
 
     --text-color-primary  : #1b1b1b;
     --text-color-secondary: #545454;

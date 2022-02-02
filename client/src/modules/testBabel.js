@@ -22,6 +22,7 @@ export default function fun() {
     }
     const op2 = 111 + 222 + 444;
     const num = 888;
+    let op3 = num + 987;
     `;
 
     const astP = template.ast(code)

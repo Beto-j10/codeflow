@@ -1,12 +1,11 @@
 <script>
-import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive, onUnmounted } from 'vue';
+import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import store from '../../store';
 import { registerStop } from '../../helpers/stopWatch';
-import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
 import moveTitle from '../../helpers/moveTitle';
 import Node from '../layouts/Node.vue';
 import Input from '../Input.vue';
-// import { forStructure } from '../../modules/controlStructure';
+import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
 
 export default defineComponent({
     components: {
@@ -14,56 +13,53 @@ export default defineComponent({
         Input
     },
     setup() {
-        let df = null
         const el = ref(null);
+        let df = null
         const nodeId = ref(0);
         const nodeData = ref({});
         const num = ref(0)
-        const varName = ref("")
         const sharedState = reactive(store.state)
+        const nodeName = ref('')
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
         // check if the value of one of its inputs changed
         const stop = watch(sharedState, () => {
-            // forStructure(df, nodeId.value)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
         })
 
         onMounted(async () => {
-
-
             await nextTick()
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
             nodeData.value = df.getNodeFromId(nodeId.value)
+            nodeName.value = nodeData.value.name;
             num.value = nodeData.value.data.num;
-            varName.value = `for_var${nodeId.value}`
-
-            nodeData.value.data.var = varName.value;
-            df.updateNodeDataFromId(nodeId.value, nodeData.value.data);
 
             moveTitle(nodeId.value)
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
                 registerStop(nodeId.value, stop)
-                store.addVar(nodeId.value, varName.value)
-                store.addModule(`for_${nodeId.value}`, df)
             }
         });
-
         return {
             el,
             num,
-            varName,
+            nodeName,
         }
     },
 })
 </script>
-//TODO: change df to nodes
+
 <template>
     <div ref="el">
-        <Node node-title="For" width="120px">
-            <Input v-model="varName" type="text" readonly />
+        <Node :node-title="nodeName" isEmpty>
+            <Input v-model.number="num" readonly />
         </Node>
     </div>
 </template>
+
+<style>
+#drawflow .Identifier .output::before {
+    content: "Number";
+}
+</style>

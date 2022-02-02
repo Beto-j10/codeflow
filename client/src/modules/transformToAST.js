@@ -27,7 +27,10 @@ export function transformToAST(data) {
 }
 
 function transformNode(node, preAST) {
-    switch (node.class) {
+
+    const nodeClass = node.class.split(' ')[0]
+
+    switch (nodeClass) {
         case "NumericLiteral":
             preAST[node.id] = {
                 type: "NumericLiteral",
@@ -51,7 +54,14 @@ function transformNode(node, preAST) {
                 init: node.inputs.input_1.connections.at(0).node,
             }
             break;
-        case "ForStatement":
+        case "Identifier":
+            preAST[node.id] = {
+                type: "identifier",
+                id: node.id,
+                name: node.name,
+            }
+            break;
+/*         case "ForStatement":
             preAST[node.id] = {
                 type: "ForStatement",
                 id: node.id,
@@ -72,7 +82,7 @@ function transformNode(node, preAST) {
                 //     body: []
                 // }
             }
-            break;
+            break; */
 
         default:
             break;

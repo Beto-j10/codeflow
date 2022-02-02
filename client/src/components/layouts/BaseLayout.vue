@@ -30,6 +30,8 @@
     align-items: center;
     padding: 0 var(--container-padding);
     border-bottom: 1px solid var(--border-color-dark);
+    background-color: var(--bg-color);
+    z-index: 2;
 }
 
 .sidebar {
@@ -38,5 +40,6 @@
 .main {
     grid-area: main;
     padding: 0;
+    position: relative;
 }
 </style>

@@ -6,12 +6,13 @@ import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
 import Input from '../Input.vue';
 import moveTitle from '../../helpers/moveTitle';
+import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
 
 export default defineComponent({
     components: {
-    Node,
-    Input
-},
+        Node,
+        Input
+    },
     setup() {
         const el = ref(null);
         let df = null
@@ -34,8 +35,11 @@ export default defineComponent({
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
 
-            registerStop(nodeId.value, stop)
             moveTitle(nodeId.value)
+            if (!checkMounted(nodeId.value)) {
+                registerMounted(nodeId.value)
+                registerStop(nodeId.value, stop)
+            }
         });
 
         return {

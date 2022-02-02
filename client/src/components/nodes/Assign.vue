@@ -6,6 +6,7 @@ import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
 import moveTitle from '../../helpers/moveTitle';
 import Input from '../Input.vue';
+import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
 
 export default defineComponent({
     components: {
@@ -41,8 +42,14 @@ export default defineComponent({
             nodeData.value.data.var = varName.value;
             df.updateNodeDataFromId(nodeId.value, nodeData.value.data);
 
-            registerStop(nodeId.value, stop)
             moveTitle(nodeId.value)
+
+            if (!checkMounted(nodeId.value)) {
+                registerMounted(nodeId.value)
+                registerStop(nodeId.value, stop)
+                store.addVar(nodeId.value ,varName.value)
+                
+            }
         });
 
         return {

@@ -37,9 +37,11 @@ const store = {
         const varIndex = this.stateVars.vars.findIndex(({ data }) => data.idParent === id)
         if (varIndex > -1) {
             const varName = this.stateVars.vars[varIndex].name
-            if (varName.startsWith("for")) {
+            if (varName.startsWith("F")) {
                 this.stateVars.vars.splice(varIndex, 1)
                 this.removeModule(`for_${id}`, editor)
+            }else if (varName.startsWith("A")) {
+                this.stateVars.vars.splice(varIndex, 1)
             }
         }
     },

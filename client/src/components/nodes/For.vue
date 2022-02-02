@@ -37,7 +37,7 @@ export default defineComponent({
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
             nodeData.value = df.getNodeFromId(nodeId.value)
             num.value = nodeData.value.data.num;
-            varName.value = `for_var${nodeId.value}`
+            varName.value = `For${nodeId.value}`
 
             nodeData.value.data.var = varName.value;
             df.updateNodeDataFromId(nodeId.value, nodeData.value.data);
@@ -47,7 +47,7 @@ export default defineComponent({
                 registerMounted(nodeId.value)
                 registerStop(nodeId.value, stop)
                 store.addVar(nodeId.value, varName.value)
-                store.addModule(`for_${nodeId.value}`, df)
+                store.addModule(varName.value, df)
             }
         });
 
@@ -62,8 +62,8 @@ export default defineComponent({
 //TODO: change df to nodes
 <template>
     <div ref="el">
-        <Node node-title="For" width="120px">
-            <Input v-model="varName" type="text" readonly />
+        <Node :node-title="varName" width="120px" isEmpty>
+            <!-- <Input v-model="varName" type="text" readonly /> -->
         </Node>
     </div>
 </template>

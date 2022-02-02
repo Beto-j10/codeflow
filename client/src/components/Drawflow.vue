@@ -102,7 +102,7 @@ export default {
                 color: "#49433440",
                 item: "For",
                 input: 3,
-                output: 1,
+                output: 0,
                 data: {
                     operator: "<",
                 },

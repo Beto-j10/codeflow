@@ -43,7 +43,13 @@ export default defineComponent({
 
                 const stop = watch(sharedState, () => {
                     console.log("sharedState", sharedState["input_1"])
-                    subtraction(Object.values(sharedState))
+                    if (sharedState[0].run ) {
+                        subtraction(Object.values(sharedState[1]))
+                    }else{
+                        nodeData.data.num = 0
+                        df.updateNodeDataFromId(nodeId.value, nodeData.data);
+                        num.value = nodeData.data.num;
+                    }
                     const isAllConnectedOutputs = checkAllConnectedOutputs(nodeId.value, df)
                     if (isAllConnectedOutputs) {
                         store.updateConnections(nodeId.value, df);

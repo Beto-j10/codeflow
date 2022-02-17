@@ -1,12 +1,13 @@
 <script>
 import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import store from '../../store';
-import { multiplication } from '../../modules/ops';
+// import { multiplication } from '../../modules/ops';
 import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
 import Input from '../Input.vue';
 import moveTitle from '../../helpers/moveTitle';
 import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
+import { checkAllConnectedOutputs } from '../../modules/checkConnections';
 
 export default defineComponent({
     components: {
@@ -15,31 +16,52 @@ export default defineComponent({
     },
     setup() {
         const el = ref(null);
-        let df = null
         const nodeId = ref(0);
-        const nodeData = ref({});
         const num = ref(0)
-        const sharedState = reactive(store.state)
+        let df = null
+        let nodeData = {};
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
-        // check if the value of one of its inputs changed
-        const stop = watch(sharedState, () => {
-            multiplication(df, nodeId.value)
-            nodeData.value = df.getNodeFromId(nodeId.value)
-            num.value = nodeData.value.data.num;
-        })
+        function multiplication(values) {
+            console.log(values)
+            const result = values.reduce((acc, val) => acc * val, 1);
+            nodeData.data.num = Math.round(result * 100) / 100
+            df.updateNodeDataFromId(nodeId.value, nodeData.data);
+            num.value = nodeData.data.num;
+        }
 
         onMounted(async () => {
             await nextTick()
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
-            nodeData.value = df.getNodeFromId(nodeId.value)
-            num.value = nodeData.value.data.num;
-
-            moveTitle(nodeId.value)
+            if (!checkMounted(nodeId.value)) {
+                store.initializeInputValues(nodeId.value, 0, 0)
+            }
+            const sharedState = reactive(store.stateConnections[nodeId.value])
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
+
+                const stop = watch(sharedState, () => {
+                    console.log("sharedState", sharedState["input_1"])
+                    if (sharedState[0].run ) {
+                        multiplication(Object.values(sharedState[1]))
+                    }else{
+                        nodeData.data.num = 0
+                        df.updateNodeDataFromId(nodeId.value, nodeData.data);
+                        num.value = nodeData.data.num;
+                    }
+                    const isAllConnectedOutputs = checkAllConnectedOutputs(nodeId.value, df)
+                    if (isAllConnectedOutputs) {
+                        store.updateConnections(nodeId.value, df);
+                    }
+                })
+                
                 registerStop(nodeId.value, stop)
+
             }
+
+            nodeData = df.getNodeFromId(nodeId.value)
+            num.value = nodeData.data.num;
+            moveTitle(nodeId.value)
         });
 
         return {

@@ -2,24 +2,52 @@
 export function transformToAST(data) {
     const preAST = {}
     const nonRootNodes = {}
-    console.log("keys", Object.keys(data))
+
     Object.keys(data).forEach(key => {
-        console.log("key", data[key])
-        transformNode(data[key], preAST)
-    })
+        const module = data[key].data
+        const moduleName = key
 
-    Object.keys(preAST).forEach(key => {
-        console.log("key", preAST[key])
-        bindingNodes(preAST[key], preAST, nonRootNodes)
-    })
+        preAST[moduleName] = {}
+        nonRootNodes[moduleName] = {}
 
-    Object.keys(nonRootNodes).forEach(key => {
-        delete preAST[key]
+        console.log("keys", Object.keys(module))
+        Object.keys(module).forEach(key => {
+            console.log("key", module[key])
+            transformNode(module[key], preAST[moduleName])
+        })
+
+        Object.keys(preAST[moduleName]).forEach(key => {
+            console.log("key", preAST[moduleName][key])
+            bindingNodes(preAST[moduleName][key], preAST[moduleName], nonRootNodes[moduleName])
+        })
+
+        Object.keys(nonRootNodes[moduleName]).forEach(key => {
+            delete preAST[moduleName][key]
+        })
+
+        if (moduleName !== "Home") {
+            const nodeId = moduleName.at(-1)
+            Object.keys(preAST[moduleName]).forEach(key => {
+                preAST.Home[nodeId].body.body.push(preAST[moduleName][key])
+            })
+            delete preAST[moduleName]
+        }
+    })
+    const AST = {
+        "program": {
+            "type": "Program",
+            "sourceType": "script",
+            "body": []
+        }
+    }
+    Object.keys(preAST["Home"]).forEach(key => {
+        AST.program.body.push(preAST["Home"][key])
     })
 
     let ot = preAST
 
     console.log("preAST#########22", JSON.stringify(ot, null, 2))
+    console.log("AST77", JSON.stringify(AST, null, 2))
     console.log("nonRootNodes =====", JSON.stringify(nonRootNodes, null, 2))
 
 
@@ -27,7 +55,6 @@ export function transformToAST(data) {
 }
 
 function transformNode(node, preAST) {
-
     const nodeClass = node.class.split(' ')[0]
 
     switch (nodeClass) {
@@ -61,7 +88,7 @@ function transformNode(node, preAST) {
                 name: node.name,
             }
             break;
-/*         case "ForStatement":
+        case "ForStatement":
             preAST[node.id] = {
                 type: "ForStatement",
                 id: node.id,
@@ -76,13 +103,12 @@ function transformNode(node, preAST) {
                     operator: "++", //to implement
                     value: node.inputs.input_3.connections.at(0).node,
                 },
-                body: node.outputs.output_1.connections.at(0).node,
-                // body: {
-                //     type: "BlockStatement",
-                //     body: []
-                // }
+                body: {
+                    type: "BlockStatement",
+                    body: []
+                }
             }
-            break; */
+            break;
 
         default:
             break;
@@ -111,12 +137,20 @@ function bindingNodes(node, preAST, nonRootNodes) {
             break;
         case "ForStatement":
 
-            nonRootNodes[node.body] = ""
+            nonRootNodes[node.test.left] = ""
+            nonRootNodes[node.test.right] = ""
+            nonRootNodes[node.update.value] = ""
 
-            node.body = preAST[node.body]
+            node.test.left = preAST[node.test.left]
+            node.test.right = preAST[node.test.right]
+            node.update.value = preAST[node.update.value]
             break;
 
         default:
             break;
     }
+}
+
+function bindingBody() {
+
 }

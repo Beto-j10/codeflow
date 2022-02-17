@@ -15,7 +15,7 @@ import NodeBlock from './nodes/Block.vue'
 import NodeVar from './nodes/Vars.vue'
 
 import store from '../store'
-import { checkConnections, checkNodeRemoved } from '../modules/constraints'
+import { checkConnected, checkConnections, checkNodeRemoved } from '../modules/checkConnections'
 import { stopWatch } from '../helpers/stopWatch'
 import { transformToAST } from '../modules/transformToAST'
 import BaseLayout from './layouts/BaseLayout.vue'
@@ -47,7 +47,7 @@ export default {
                     num: 0,
                     operator: "+",
                 },
-                class: "BinaryExpression Addition",
+                class: "BinaryExpression Addition ops",
             },
             {
                 name: "Subtraction",
@@ -59,7 +59,7 @@ export default {
                     num: 0,
                     operator: "-",
                 },
-                class: "BinaryExpression Subtraction",
+                class: "BinaryExpression Subtraction ops",
             },
             {
                 name: "Multiplication",
@@ -71,7 +71,7 @@ export default {
                     num: 0,
                     operator: "*",
                 },
-                class: "BinaryExpression Multiplication",
+                class: "BinaryExpression Multiplication ops",
             },
             {
                 name: "Division",
@@ -83,17 +83,18 @@ export default {
                     num: 0,
                     operator: "/",
                 },
-                class: "BinaryExpression Division",
+                class: "BinaryExpression Division ops",
             },
             {
                 name: "Assign",
                 color: "#49433440",
                 item: "Assign",
                 input: 1,
-                output: 1,
+                output: 0,
                 data: {
                     num: 0,
                     var: "",
+                    idChild: 0,
                 },
                 class: "VariableDeclarator Assign",
             },
@@ -129,7 +130,7 @@ export default {
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
         function exportEditor() {
             dialogData.value = editor.value.export();
-            transformToAST(dialogData.value.drawflow.Home.data);
+            transformToAST(dialogData.value.drawflow);
             dialogVisible.value = true;
         }
         const drag = (ev, nodeVar) => {
@@ -186,12 +187,15 @@ export default {
                 // checkNodeRemoved(id, editor.value);
             });
             editor.value.on("connectionCreated", (ids) => {
-                checkConnections(ids, editor.value);
-                store.updateState();
+                console.log("connectionCreated", ids);
+                store.updateConnectionsForConnectionCreated(ids, editor.value)
+                // checkConnected(ids.input_id, editor.value)
+                // checkConnections(ids, editor.value);
+                // store.updateState();
             });
-            editor.value.on("connectionRemoved", async () => {
-                await nextTick();
-                store.updateState();
+            editor.value.on("connectionRemoved", (ids) => {
+                console.log("connectionRemoved", ids);
+                store.updateConnectionsForConnectionRemoved(ids.input_id, ids.input_class)
             });
         });
         watch(varsState, () => {

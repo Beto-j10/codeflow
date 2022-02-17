@@ -4,6 +4,7 @@ import store from '../../store';
 import Node from '../layouts/Node.vue';
 import moveTitle from '../../helpers/moveTitle';
 import Input from '../Input.vue';
+import { checkAllConnectedOutputs } from '../../modules/checkConnections';
 
 export default defineComponent({
     components: {
@@ -26,7 +27,10 @@ export default defineComponent({
         const handleChange = (value) => {
             nodeData.value.data.num = value;
             df.updateNodeDataFromId(nodeId.value, nodeData.value.data);
-            store.updateState()
+            const isAllConnectedOutputs = checkAllConnectedOutputs(nodeId.value, df);
+            if (isAllConnectedOutputs) {
+                store.updateConnections(nodeId.value, df);
+            }
         }
 
         onMounted(async () => {

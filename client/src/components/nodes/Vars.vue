@@ -6,6 +6,7 @@ import moveTitle from '../../helpers/moveTitle';
 import Node from '../layouts/Node.vue';
 import Input from '../Input.vue';
 import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
+import { assignValue } from '../../modules/ops';
 
 export default defineComponent({
     components: {
@@ -34,6 +35,7 @@ export default defineComponent({
             nodeData.value = df.getNodeFromId(nodeId.value)
             nodeName.value = nodeData.value.name;
             num.value = nodeData.value.data.num;
+            assignValue(df, nodeId.value)
 
             moveTitle(nodeId.value)
             if (!checkMounted(nodeId.value)) {

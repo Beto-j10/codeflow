@@ -13,6 +13,7 @@ import NodeAssign from './nodes/Assign.vue'
 import NodeFor from './nodes/For.vue'
 import NodeBlock from './nodes/Block.vue'
 import NodeVar from './nodes/Vars.vue'
+import NodeVarFor from './nodes/VarFor.vue'
 
 import store from '../store'
 import { CheckClassOps, checkConnected, checkConnections, checkNodeRemoved } from '../modules/checkConnections'
@@ -203,7 +204,12 @@ export default {
         });
         watch(varsState, () => {
             varsState.forEach(element => {
-                editor.value.registerNode(element.name, NodeVar, {}, {});
+                if (element.name.startsWith("F")) {
+                    editor.value.registerNode(element.name, NodeVarFor, {}, {});
+
+                } else if (element.name.startsWith("A")) {
+                    editor.value.registerNode(element.name, NodeVar, {}, {});
+                }
             });
         });
         return {

@@ -21,7 +21,7 @@ export default function fun() {
 
     }
     const op2 = 111 + 222 + 444;
-    const num = 888;
+    const num = 888 + 369;
     let op3 = num + 987;
     `;
 

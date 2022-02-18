@@ -78,6 +78,10 @@ function transformNode(node, preAST) {
             preAST[node.id] = {
                 type: "VariableDeclarator",
                 id: node.id,
+                idType: {
+                    type: "Identifier",
+                    name: node.data.var,
+                },
                 init: node.inputs.input_1.connections.at(0).node,
             }
             break;

@@ -15,7 +15,7 @@ import NodeBlock from './nodes/Block.vue'
 import NodeVar from './nodes/Vars.vue'
 
 import store from '../store'
-import { checkConnected, checkConnections, checkNodeRemoved } from '../modules/checkConnections'
+import { CheckClassOps, checkConnected, checkConnections, checkNodeRemoved } from '../modules/checkConnections'
 import { stopWatch } from '../helpers/stopWatch'
 import { transformToAST } from '../modules/transformToAST'
 import BaseLayout from './layouts/BaseLayout.vue'
@@ -94,9 +94,8 @@ export default {
                 data: {
                     num: 0,
                     var: "",
-                    idChild: 0,
                 },
-                class: "VariableDeclarator Assign",
+                class: "VariableDeclarator Assign ops",
             },
             {
                 name: "For",
@@ -188,14 +187,18 @@ export default {
             });
             editor.value.on("connectionCreated", (ids) => {
                 console.log("connectionCreated", ids);
-                store.updateConnectionsForConnectionCreated(ids, editor.value)
+                if (CheckClassOps(ids.input_id, editor.value)) {
+                    store.updateConnectionsForConnectionCreated(ids, editor.value)
+                }
                 // checkConnected(ids.input_id, editor.value)
                 // checkConnections(ids, editor.value);
                 // store.updateState();
             });
             editor.value.on("connectionRemoved", (ids) => {
                 console.log("connectionRemoved", ids);
-                store.updateConnectionsForConnectionRemoved(ids.input_id, ids.input_class)
+                if (CheckClassOps(ids.input_id, editor.value)) {
+                    store.updateConnectionsForConnectionRemoved(ids.input_id, ids.input_class)
+                }
             });
         });
         watch(varsState, () => {
@@ -276,14 +279,12 @@ export default {
                             <li
                                 class="modules__item modules__item--selected"
                                 @click="handleClickItem($event, 'Home')"
-                            >
-                                Main
-                            </li>
+                            >Main</li>
                             <li
                                 class="modules__item"
                                 v-for="(m, i) in modulesState"
                                 :key="i"
-                                @click="handleClickItem($event,m)"
+                                @click="handleClickItem($event, m)"
                             >
                                 <!-- <div class="modules__node" @click="changeModule(m)">{{ m }}</div> -->
                                 {{ m }}
@@ -449,8 +450,8 @@ export default {
     background-color: var(--color-white);
 }
 
-
-.modules__item:hover, .modules__item--home:hover{
+.modules__item:hover,
+.modules__item--home:hover {
     background-color: var(--color-primary-light);
     color: var(--color-white);
     border-color: var(--color-primary-light);

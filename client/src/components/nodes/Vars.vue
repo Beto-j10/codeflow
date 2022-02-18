@@ -6,7 +6,7 @@ import moveTitle from '../../helpers/moveTitle';
 import Node from '../layouts/Node.vue';
 import Input from '../Input.vue';
 import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
-import { assignValue } from '../../modules/ops';
+import { checkAllConnectedOutputs } from '../../modules/checkConnections';
 
 export default defineComponent({
     components: {
@@ -15,34 +15,50 @@ export default defineComponent({
     },
     setup() {
         const el = ref(null);
-        let df = null
         const nodeId = ref(0);
-        const nodeData = ref({});
         const num = ref(0)
-        const sharedState = reactive(store.state)
         const nodeName = ref('')
+        let nodeData = {};
+        let df = null
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
-
-        // check if the value of one of its inputs changed
-        const stop = watch(sharedState, () => {
-            nodeData.value = df.getNodeFromId(nodeId.value)
-            num.value = nodeData.value.data.num;
-        })
 
         onMounted(async () => {
             await nextTick()
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
-            nodeData.value = df.getNodeFromId(nodeId.value)
-            nodeName.value = nodeData.value.name;
-            num.value = nodeData.value.data.num;
-            assignValue(df, nodeId.value)
+            nodeData = df.getNodeFromId(nodeId.value)
 
+            const sharedState = reactive(store.stateConnections[nodeData.data.idParent])
+            nodeName.value = nodeData.name;
+            nodeData.data.num = sharedState[1].input_1
+            num.value = nodeData.data.num;
+            df.updateNodeDataFromId(nodeId.value, nodeData.data);
             moveTitle(nodeId.value)
+
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
+
+                const stop = watch(sharedState, () => {
+                    if (sharedState[0].run) {
+                        nodeData.data.num = sharedState[1].input_1
+                    } else {
+                        nodeData.data.num = 0
+                    }
+                    df.updateNodeDataFromId(nodeId.value, nodeData.data);
+                    num.value = nodeData.data.num;
+
+                    const isAllConnectedOutputs = checkAllConnectedOutputs(nodeId.value, df)
+                    if (isAllConnectedOutputs) {
+                        store.updateConnections(nodeId.value, df);
+                    }
+
+                })
+
                 registerStop(nodeId.value, stop)
+
             }
+
         });
+
         return {
             el,
             num,

@@ -61,3 +61,12 @@ export function checkNodeRemoved(id, editor) {
     }
 
 }
+
+export function CheckClassOps(id, editor) {
+    const nodeData = editor.getNodeFromId(id)
+    const nodeClass = nodeData.class.split(" ").at(-1)
+    if (nodeClass === "ops") {
+        return true
+    }
+    return false
+}

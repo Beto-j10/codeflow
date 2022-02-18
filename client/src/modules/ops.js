@@ -126,32 +126,6 @@ export function division(df, nodeId) {
  * @param {string} varName
  */
 
-export function assign(df, nodeId, varName) {
-    
-    const nodeData = df.getNodeFromId(nodeId)
-
-    const inputs = nodeData.inputs
-    if (inputs.input_1.connections.at(0)) {
-
-        const inputId = inputs.input_1.connections[0].node
-        const inputData = df.getNodeFromId(inputId)
-        nodeData.data.num = inputData.data.num
-
-    } else {
-        nodeData.data.num = 0
-    }
-    nodeData.data.var = varName
-
-    const idChild = nodeData.data.idChild
-    if (idChild) {
-        const childNodeData = df.getNodeFromId(idChild)
-        childNodeData.data.num = nodeData.data.num
-        df.updateNodeDataFromId(idChild, childNodeData.data);
-    }
-
-    df.updateNodeDataFromId(nodeId, nodeData.data);
-}
-
 /**
  * gets the value of the node and assigns it to the variable
  * @param {object} df 

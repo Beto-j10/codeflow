@@ -55,7 +55,7 @@ const store = {
         checkAllConnectedInputs(ids.input_id, editor)
     },
 
-    addVar(id, name) {emovedConecction
+    addVar(id, name) {
         this.stateVars.vars.push({
             name: name,
             color: "#49433440",
@@ -66,7 +66,7 @@ const store = {
                 num: 0,
                 idParent: id,
             },
-            class: "Identifier",
+            class: "Identifier ops",
         })
     },
 

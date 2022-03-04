@@ -14,6 +14,7 @@ import NodeFor from './nodes/For.vue'
 import NodeBlock from './nodes/Block.vue'
 import NodeVar from './nodes/Vars.vue'
 import NodeVarFor from './nodes/VarFor.vue'
+import NodeIf from './nodes/If.vue'
 
 import store from '../store'
 import { CheckClassOps, checkConnected, checkConnections, checkNodeRemoved } from '../modules/checkConnections'
@@ -110,6 +111,16 @@ export default {
                 class: "ForStatement",
             },
             {
+                name: "If",
+                color: "#49433440",
+                item: "If",
+                input: 2,
+                output: 0,
+                data: {
+                },
+                class: "IfStatement",
+            },
+            {
                 name: "Block",
                 color: "#49433440",
                 item: "Block",
@@ -180,10 +191,12 @@ export default {
             editor.value.registerNode("For", NodeFor, {}, {});
             editor.value.registerNode("Num", Number, {}, {});
             editor.value.registerNode("Block", NodeBlock, {}, {});
+            editor.value.registerNode("If", NodeIf, {}, {});
+
             editor.value.on("nodeRemoved", (id) => {
                 stopWatch(id);
                 unregisterMounted(id);
-                store.deleteVar(id, editor.value)
+                store.deleteState(id, editor.value)
                 // checkNodeRemoved(id, editor.value);
             });
             editor.value.on("connectionCreated", (ids) => {
@@ -290,10 +303,10 @@ export default {
                                 class="modules__item"
                                 v-for="(m, i) in modulesState"
                                 :key="i"
-                                @click="handleClickItem($event, m)"
+                                @click="handleClickItem($event, m.name)"
                             >
                                 <!-- <div class="modules__node" @click="changeModule(m)">{{ m }}</div> -->
-                                {{ m }}
+                                {{ m.name }}
                             </li>
                         </ul>
                     </div>
@@ -489,6 +502,13 @@ export default {
 #drawflow .ForStatement .output_1::before {
     content: "Do";
 }
+#drawflow .IfStatement .input_1::after {
+    content: "Left";
+}
+#drawflow .IfStatement .input_2::after {
+    content: "Right";
+}
+
 
 #drawflow .BinaryExpression .input_1::after,
 #drawflow .BinaryExpression .input_2::after,

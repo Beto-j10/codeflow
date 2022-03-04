@@ -20,15 +20,7 @@ export default defineComponent({
         const nodeData = ref({});
         const num = ref(0)
         const varName = ref("")
-        // const sharedState = reactive(store.state)
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
-
-        // check if the value of one of its inputs changed
-        // const stop = watch(sharedState, () => {
-        //     // forStructure(df, nodeId.value)
-        //     nodeData.value = df.getNodeFromId(nodeId.value)
-        //     num.value = nodeData.value.data.num;
-        // })
 
         onMounted(async () => {
 
@@ -45,7 +37,6 @@ export default defineComponent({
             moveTitle(nodeId.value)
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
-                // registerStop(nodeId.value, stop)
                 store.addVar(nodeId.value, varName.value)
                 store.addModule(varName.value, df)
             }

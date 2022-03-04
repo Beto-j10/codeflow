@@ -29,6 +29,7 @@ export default {
     order: 1;
     width: 100%;
     pointer-events: none;
+    align-self: flex-start;
 }
 
 .nodeLayout__container {

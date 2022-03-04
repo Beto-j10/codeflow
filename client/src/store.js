@@ -16,9 +16,9 @@ const store = {
     }),
 
     initializeInputValues(nodeID, ...values) {
-        this.stateConnections[nodeID] = [{run:false},{}]
+        this.stateConnections[nodeID] = [{ run: false }, {}]
         values.forEach((value, index) => {
-            const input = `input_${index+1}`
+            const input = `input_${index + 1}`
             this.stateConnections[nodeID][1][input] = value
         })
         console.log("initialize", this.stateConnections)
@@ -49,7 +49,7 @@ const store = {
         this.stateConnections[nodeID][1][input] = 0
     },
 
-    updateConnectionsForConnectionCreated(ids, editor){
+    updateConnectionsForConnectionCreated(ids, editor) {
         const nodeDataOutput = editor.getNodeFromId(ids.output_id)
         this.stateConnections[ids.input_id][1][ids.input_class] = nodeDataOutput.data.num
         checkAllConnectedInputs(ids.input_id, editor)
@@ -70,28 +70,39 @@ const store = {
         })
     },
 
-    deleteVar(id, editor) {
-        const varIndex = this.stateVars.vars.findIndex(({ data }) => data.idParent === id)
-        if (varIndex > -1) {
-            const varName = this.stateVars.vars[varIndex].name
-            if (varName.startsWith("F")) {
-                this.stateVars.vars.splice(varIndex, 1)
-                this.removeModule(`For${id}`, editor)
-            } else if (varName.startsWith("A")) {
-                this.stateVars.vars.splice(varIndex, 1)
-            }
-        }
+    removeVar(varIndex) {
+        this.stateVars.vars.splice(varIndex, 1)
     },
 
     addModule(name, df) {
         df.addModule(name)
-        this.stateModules.modules.push(name)
+        const id = name.at(-1)
+        this.stateModules.modules.push({ name, id })
     },
 
-    removeModule(name, editor) {
-        this.stateModules.modules.splice(this.stateModules.modules.indexOf(name), 1)
-        editor.removeModule(name)
-    }
+    removeModule(moduleIndex, editor) {
+        editor.removeModule(this.stateModules.modules[moduleIndex].name)
+        this.stateModules.modules.splice(moduleIndex, 1)
+    },
+
+    deleteState(id, editor) {
+        const varIndex = this.stateVars.vars.findIndex(({ data }) => data.idParent === id)
+        const moduleIndex = this.stateModules.modules.findIndex((module) => module.id === id)
+
+        if (varIndex === -1 && moduleIndex === -1) {
+            return
+        }
+        if (moduleIndex > -1) {
+            const moduleName = this.stateModules.modules[moduleIndex].name
+            if (moduleName.startsWith("F")) {
+                this.removeVar(varIndex)
+            }
+            console.log("holaa")
+            this.removeModule(moduleIndex, editor)
+        }else {
+            this.removeVar(varIndex)
+        }
+    },
 
 }
 

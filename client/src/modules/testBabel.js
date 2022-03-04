@@ -14,15 +14,15 @@ export default function fun() {
         let element = 0
         element += i;
     }
+    const op2 = 111 + 222 + 444;
+    const num = 888 + 369;
+    let op3 = num + 987;
     const flag = true
-    if (flag) {
+    if (flag === 5) {
         const op = 88 * 44 + 22 + 11 * 66 + 77; 
     }else{
 
     }
-    const op2 = 111 + 222 + 444;
-    const num = 888 + 369;
-    let op3 = num + 987;
     `;
 
     const astP = template.ast(code)

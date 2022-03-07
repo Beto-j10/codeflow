@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { checkAllConnectedInputs } from './modules/checkConnections';
+import { checkAllConnectedInputs, CheckClassOps } from './modules/checkConnections';
 
 const store = {
 
@@ -14,6 +14,12 @@ const store = {
     stateModules: reactive({
         modules: [],
     }),
+
+    printStates(){
+        console.log("stateConnections", this.stateConnections)
+        console.log("stateVars", this.stateVars.vars)
+        console.log("stateModules", this.stateModules.modules)
+    },
 
     initializeInputValues(nodeID, ...values) {
         this.stateConnections[nodeID] = [{ run: false }, {}]
@@ -33,9 +39,13 @@ const store = {
         const outputs = nodeData.outputs
         Object.keys(outputs).forEach(output => {
             outputs[output].connections.forEach(connection => {
-                const input = connection.output
-                checkAllConnectedInputs(connection.node, df)
-                this.stateConnections[connection.node][1][input] = nodeData.data.num
+
+                // check if the connection is connected to a node that is an ops node
+                if (CheckClassOps(connection.node, df)) {                
+                    const input = connection.output
+                    checkAllConnectedInputs(connection.node, df)
+                    this.stateConnections[connection.node][1][input] = nodeData.data.num
+                }
             })
         })
     },
@@ -74,10 +84,24 @@ const store = {
         this.stateVars.vars.splice(varIndex, 1)
     },
 
-    addModule(name, df) {
+    addModule(name, id, df) {
         df.addModule(name)
-        const id = name.at(-1)
         this.stateModules.modules.push({ name, id })
+    },
+
+    addModuleElse(name, id, df) {
+        df.addModule(name)
+        const moduleIndex = this.stateModules.modules.findIndex((module) => module.id === id)
+        this.stateModules.modules[moduleIndex].else = name
+        this.stateModules.modules.push({ name, id: `${id}.1` })
+    },
+
+    checkModuleElse(name){
+        const moduleIndex = this.stateModules.modules.findIndex((module) => module.name === name)
+        if (moduleIndex !== -1) {
+            return true
+        }
+        return false
     },
 
     removeModule(moduleIndex, editor) {
@@ -85,23 +109,43 @@ const store = {
         this.stateModules.modules.splice(moduleIndex, 1)
     },
 
+    removeModuleELse(id, editor) {
+        const moduleIndex = this.stateModules.modules.findIndex((module) => module.id === id)
+        editor.removeModule(this.stateModules.modules[moduleIndex].else)
+        const moduleElseIndex = this.stateModules.modules.findIndex((module) => module.id === `${id}.1`)
+        this.stateModules.modules.splice(moduleElseIndex, 1)
+        delete this.stateModules.modules[moduleIndex].else
+    },
+
     deleteState(id, editor) {
         const varIndex = this.stateVars.vars.findIndex(({ data }) => data.idParent === id)
         const moduleIndex = this.stateModules.modules.findIndex((module) => module.id === id)
 
+        // not a var and not a module
         if (varIndex === -1 && moduleIndex === -1) {
             return
         }
-        if (moduleIndex > -1) {
-            const moduleName = this.stateModules.modules[moduleIndex].name
-            if (moduleName.startsWith("F")) {
-                this.removeVar(varIndex)
-            }
-            console.log("holaa")
-            this.removeModule(moduleIndex, editor)
-        }else {
+
+        // is a var
+        if (varIndex !== -1 && moduleIndex === -1) {
             this.removeVar(varIndex)
+            return
         }
+
+        // is module For
+        if (varIndex !== -1 && moduleIndex !== -1) {
+            this.removeVar(varIndex)
+            this.removeModule(moduleIndex, editor)
+            return
+
+        }
+
+        // is module If
+        // check if module has else
+        if (this.stateModules.modules[moduleIndex]?.else) {
+            this.removeModuleELse(id, editor)
+        }
+        this.removeModule(moduleIndex, editor)
     },
 
 }

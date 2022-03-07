@@ -38,7 +38,7 @@ export default defineComponent({
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
                 store.addVar(nodeId.value, varName.value)
-                store.addModule(varName.value, df)
+                store.addModule(varName.value, nodeId.value, df)
             }
         });
 

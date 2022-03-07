@@ -26,6 +26,7 @@ export function transformToAST(data) {
         })
 
         if (moduleName !== "Home") {
+            console.log("IFModulePreAST", preAST)
             const nodeId = moduleName.at(-1)
             Object.keys(preAST[moduleName]).forEach(key => {
                 preAST.Home[nodeId].body.body.push(preAST[moduleName][key])

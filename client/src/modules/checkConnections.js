@@ -26,17 +26,21 @@ export function checkConnected(nodeID, editor) {
     console.log(store.stateConnections)
 }
 
+/**
+ * check if all inputs are connected and set the run state of the node to true if they are
+ * @param {number} nodeID 
+ * @param {object} editor 
+ */
+
 export function checkAllConnectedInputs(nodeID, editor) {
     const nodeData = editor.getNodeFromId(nodeID)
     const inputs = nodeData.inputs
     for (const input of Object.keys(inputs)) {
         if (!inputs[input].connections.at(0)) {
-            // store.updateRun(nodeID, false)
             return
         }
     }
     store.updateRun(nodeID, true)
-    // return true
 }
 
 export function checkAllConnectedOutputs(nodeID, editor) {

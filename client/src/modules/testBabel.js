@@ -9,6 +9,13 @@ import compiler from '../service/compiler';
 
 export default function fun() {
     const code = `
+    
+    let varrr = 69;
+    for (varrr; varrr < 12; varrr++) {
+        const max = 6
+        let element = 0
+        element += varrr;
+    }
     for (let i = 4; i < 12; i++) {
         const max = 6
         let element = 0
@@ -30,29 +37,29 @@ export default function fun() {
 
 
     const ast = parse(code)
-    console.log("####", JSON.stringify(ast, null, 2), "#####")
+    // console.log("####", JSON.stringify(ast, null, 2), "#####")
 
 
-    traverse(ast, {
-        enter(path) {
-            switch (path.node.type) {
-                case 'VariableDeclarator':
-                    console.log("I'm a: ", path.node.id.name)
-                    break;
-                case 'ForStatement':
-                    const forMin = path.node.init.declarations[0].init.value
-                    const forMax = path.node.test.right.value
-                    console.log("I'm a: ", forMin)
-                    console.log("I'm a: ", forMax)
-                    transformToCode('for', forMin, forMax)
-                    path.skip()
-                    break;
-                case 'IfStatement':
-                    console.log("I'm a: ", path.node.type)
-                    break;
-            }
-        }
-    });
+    // traverse(ast, {
+    //     enter(path) {
+    //         switch (path.node.type) {
+    //             case 'VariableDeclarator':
+    //                 console.log("I'm a: ", path.node.id.name)
+    //                 break;
+    //             case 'ForStatement':
+    //                 const forMin = path.node.init.declarations[0].init.value
+    //                 const forMax = path.node.test.right.value
+    //                 console.log("I'm a: ", forMin)
+    //                 console.log("I'm a: ", forMax)
+    //                 transformToCode('for', forMin, forMax)
+    //                 path.skip()
+    //                 break;
+    //             case 'IfStatement':
+    //                 console.log("I'm a: ", path.node.type)
+    //                 break;
+    //         }
+    //     }
+    // });
 
     const output = generate(ast, code);
     // console.log(output.code); // 'const x = 1;'

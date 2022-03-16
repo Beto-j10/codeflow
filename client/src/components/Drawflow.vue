@@ -117,17 +117,9 @@ export default {
                 input: 2,
                 output: 0,
                 data: {
+                    operator: "==",
                 },
                 class: "IfStatement",
-            },
-            {
-                name: "Block",
-                color: "#49433440",
-                item: "Block",
-                input: 0,
-                output: 1,
-                data: {},
-                class: "BlockStatement",
             },
         ]);
         let isModulesBar = ref(true)
@@ -139,6 +131,7 @@ export default {
         const Vue = { version: 3, h, render };
         const internalInstance = getCurrentInstance();
         internalInstance.appContext.app._context.config.globalProperties.$df = editor;
+        
         function exportEditor() {
             dialogData.value = editor.value.export();
             transformToAST(dialogData.value.drawflow);
@@ -193,6 +186,8 @@ export default {
             editor.value.registerNode("Block", NodeBlock, {}, {});
             editor.value.registerNode("If", NodeIf, {}, {});
 
+            editor.value.force_first_input = true;
+
             editor.value.on("nodeRemoved", (id) => {
                 stopWatch(id);
                 unregisterMounted(id);
@@ -200,7 +195,7 @@ export default {
                 // checkNodeRemoved(id, editor.value);
             });
             editor.value.on("connectionCreated", (ids) => {
-                console.log("connectionCreated", ids);
+                // console.log("connectionCreated", ids);
                 if (CheckClassOps(ids.input_id, editor.value)) {
                     store.updateConnectionsForConnectionCreated(ids, editor.value)
                 }
@@ -209,7 +204,7 @@ export default {
                 // store.updateState();
             });
             editor.value.on("connectionRemoved", (ids) => {
-                console.log("connectionRemoved", ids);
+                // console.log("connectionRemoved", ids);
                 if (CheckClassOps(ids.input_id, editor.value)) {
                     store.updateConnectionsForConnectionRemoved(ids.input_id, ids.input_class)
                 }

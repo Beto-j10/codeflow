@@ -1,13 +1,32 @@
 <script setup>
-import { ref } from 'vue';
+import { getCurrentInstance, nextTick, onMounted, ref } from 'vue';
 
+const value = ref("==")
+let nodeData = {};
+let df = null
+df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
-let value = ref("--")
+const props = defineProps({
+    nodeID: {
+        type: String,
+        required: true,
+    },
+})
+
+function handleChange(e) {
+    value.value = e.target.value
+    nodeData = df.getNodeFromId(props.nodeID)
+    nodeData.data.operator = value.value
+    df.updateNodeDataFromId(props.nodeID, nodeData.data)
+}
+
+nodeData = df.getNodeFromId(props.nodeID)
+value.value = nodeData.data.operator
 
 </script>
 
 <template>
-    <select class="select" v-model="value">
+    <select class="select" v-model="value" @change="handleChange">
         <option value="--" disabled>Select Operator</option>
         <option value="==">Equal to (==)</option>
         <option value="!=">Not equal to (!=)</option>
@@ -17,7 +36,8 @@ let value = ref("--")
         <option value="<=">Less than or equal to (&lt;=)</option>
     </select>
     <div class="select__text">
-        Left <span class="select__operator"> {{ value }} </span> Right
+        Left
+        <span class="select__operator">{{ value }}</span> Right
     </div>
 </template>
 

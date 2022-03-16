@@ -1,39 +1,58 @@
+import { transformToCode } from "./transformToCode"
 
 export function transformToAST(data) {
     const preAST = {}
     const nonRootNodes = {}
 
-    Object.keys(data).forEach(key => {
-        const module = data[key].data
-        const moduleName = key
+    Object.keys(data).forEach(moduleName => {
+        const module = data[moduleName].data
 
         preAST[moduleName] = {}
         nonRootNodes[moduleName] = {}
 
-        console.log("keys", Object.keys(module))
-        Object.keys(module).forEach(key => {
-            console.log("key", module[key])
-            transformNode(module[key], preAST[moduleName])
+        Object.keys(module).forEach(node => {
+            transformNode(module[node], preAST[moduleName])
         })
 
-        Object.keys(preAST[moduleName]).forEach(key => {
-            console.log("key", preAST[moduleName][key])
-            bindingNodes(preAST[moduleName][key], preAST[moduleName], nonRootNodes[moduleName])
+        Object.keys(preAST[moduleName]).forEach(node => {
+            bindingNodes(preAST[moduleName][node], preAST[moduleName], nonRootNodes[moduleName])
         })
 
         Object.keys(nonRootNodes[moduleName]).forEach(key => {
             delete preAST[moduleName][key]
         })
+        if (/(if|else|for)/i.test(moduleName)) {
 
-        if (moduleName !== "Home") {
-            console.log("IFModulePreAST", preAST)
-            const nodeId = moduleName.at(-1)
-            Object.keys(preAST[moduleName]).forEach(key => {
-                preAST.Home[nodeId].body.body.push(preAST[moduleName][key])
-            })
-            delete preAST[moduleName]
+            const splitModuleName = moduleName.split(/(if|else|for)/i)
+            console.log("splitModuleName", splitModuleName)
+            const moduleType = splitModuleName[1].toLowerCase()
+            const moduleId = splitModuleName[2]
+
+            switch (moduleType) {
+                case "if":
+                    Object.keys(preAST[moduleName]).forEach(node => {
+                        preAST.Home[moduleId].consequent.body.push(preAST[moduleName][node])
+                    })
+                    delete preAST[moduleName]
+                    break;
+                case "else":
+                    Object.keys(preAST[moduleName]).forEach(node => {
+                        preAST.Home[moduleId].alternate.body.push(preAST[moduleName][node])
+                    })
+                    delete preAST[moduleName]
+                    break;
+                case "for":
+                    Object.keys(preAST[moduleName]).forEach(node => {
+                        preAST.Home[moduleId].body.body.push(preAST[moduleName][node])
+                    })
+                    delete preAST[moduleName]
+                    break;
+                default:
+                    break;
+            }
         }
     })
+
     const AST = {
         "program": {
             "type": "Program",
@@ -51,23 +70,24 @@ export function transformToAST(data) {
     console.log("AST77", JSON.stringify(AST, null, 2))
     console.log("nonRootNodes =====", JSON.stringify(nonRootNodes, null, 2))
 
-
+    const toCode = transformToCode(AST.program)
+    console.log("toCode", toCode)
 
 }
 
-function transformNode(node, preAST) {
+function transformNode(node, module) {
     const nodeClass = node.class.split(' ')[0]
 
     switch (nodeClass) {
         case "NumericLiteral":
-            preAST[node.id] = {
+            module[node.id] = {
                 type: "NumericLiteral",
                 id: node.id,
                 value: node.data.num,
             }
             break;
         case "BinaryExpression":
-            preAST[node.id] = {
+            module[node.id] = {
                 type: "BinaryExpression",
                 id: node.id,
                 operator: node.data.operator,
@@ -76,7 +96,7 @@ function transformNode(node, preAST) {
             }
             break;
         case "VariableDeclarator":
-            preAST[node.id] = {
+            module[node.id] = {
                 type: "VariableDeclarator",
                 id: node.id,
                 idType: {
@@ -87,16 +107,20 @@ function transformNode(node, preAST) {
             }
             break;
         case "Identifier":
-            preAST[node.id] = {
-                type: "identifier",
+            module[node.id] = {
+                type: "Identifier",
                 id: node.id,
                 name: node.name,
             }
             break;
         case "ForStatement":
-            preAST[node.id] = {
+            module[node.id] = {
                 type: "ForStatement",
                 id: node.id,
+                init: {
+                    type: "Identifier",
+                    name: node.data.var,
+                },
                 test: {
                     type: "BinaryExpression",
                     operator: node.data.operator,
@@ -114,13 +138,35 @@ function transformNode(node, preAST) {
                 }
             }
             break;
+        case "IfStatement":
+            module[node.id] = {
+                type: "IfStatement",
+                id: node.id,
+                test: {
+                    type: "BinaryExpression",
+                    operator: node.data.operator,
+                    left: node.inputs.input_1.connections.at(0).node,
+                    right: node.inputs.input_2.connections.at(0).node,
+                },
+                consequent: {
+                    type: "BlockStatement",
+                    body: []
+                },
+                alternate: {
+                    type: "BlockStatement",
+                    body: []
+                }
+            }
 
         default:
             break;
     }
+
+    const moduleJSON = JSON.stringify(module, null, 2)
+    console.log("moduleJSON", moduleJSON)
 }
 
-function bindingNodes(node, preAST, nonRootNodes) {
+function bindingNodes(node, module, nonRootNodes) {
     switch (node.type) {
         case "NumericLiteral":
 
@@ -130,15 +176,15 @@ function bindingNodes(node, preAST, nonRootNodes) {
             nonRootNodes[node.left] = ""
             nonRootNodes[node.right] = ""
 
-            node.left = preAST[node.left]
-            node.right = preAST[node.right]
+            node.left = module[node.left]
+            node.right = module[node.right]
             break;
 
         case "VariableDeclarator":
 
             nonRootNodes[node.init] = ""
 
-            node.init = preAST[node.init]
+            node.init = module[node.init]
             break;
         case "ForStatement":
 
@@ -146,10 +192,19 @@ function bindingNodes(node, preAST, nonRootNodes) {
             nonRootNodes[node.test.right] = ""
             nonRootNodes[node.update.value] = ""
 
-            node.test.left = preAST[node.test.left]
-            node.test.right = preAST[node.test.right]
-            node.update.value = preAST[node.update.value]
+            node.test.left = module[node.test.left]
+            node.test.right = module[node.test.right]
+            node.update.value = module[node.update.value]
             break;
+        case "IfStatement":
+
+            nonRootNodes[node.test.left] = ""
+            nonRootNodes[node.test.right] = ""
+
+            node.test.left = module[node.test.left]
+            node.test.right = module[node.test.right]
+            break;
+
 
         default:
             break;

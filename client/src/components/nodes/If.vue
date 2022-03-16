@@ -19,6 +19,7 @@ export default defineComponent({
         const nodeId = ref("");
         const moduleName = ref("")
         const hasElse = ref(false);
+        const isMounted = ref(false);
 
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
 
@@ -35,6 +36,7 @@ export default defineComponent({
                 registerMounted(nodeId.value)
                 store.addModule(moduleName.value, nodeId.value, df)
             }
+            isMounted.value = true
         });
 
         function handleElse(e) {
@@ -51,6 +53,8 @@ export default defineComponent({
             moduleName,
             handleElse,
             hasElse,
+            nodeId,
+            isMounted
         }
     },
 })
@@ -59,30 +63,35 @@ export default defineComponent({
 <template>
     <div ref="el">
         <Node :node-title="moduleName" width="150px">
-            <Select />
+            <Select v-if="isMounted" :nodeID="nodeId" />
             <div class="checkElse">
-                <label class="checkElse__label" >Else</label>
-                <input class="checkElse__checkbox" v-model="hasElse" type="checkbox" @change="handleElse"/>
+                <label class="checkElse__label">Else</label>
+                <input
+                    class="checkElse__checkbox"
+                    v-model="hasElse"
+                    type="checkbox"
+                    @change="handleElse"
+                />
             </div>
         </Node>
     </div>
 </template>
 
 <style scoped>
-    .checkElse {
-        display: flex;
-        align-items: center;
-        font-size: var(--font-size-base);
-        color: var(--text-color-secondary);
-        padding: 4px 0 0;
-    }
+.checkElse {
+    display: flex;
+    align-items: center;
+    font-size: var(--font-size-base);
+    color: var(--text-color-secondary);
+    padding: 4px 0 0;
+}
 
-    .checkElse__label {
-        padding-right: 4px;
-    }
+.checkElse__label {
+    padding-right: 4px;
+}
 
-    .checkElse__checkbox {
-        width: 12px;
-        height: 12px;
-    }
+.checkElse__checkbox {
+    width: 12px;
+    height: 12px;
+}
 </style>

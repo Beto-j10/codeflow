@@ -1,0 +1,70 @@
+:root {
+    --color-primary: #4ea9ff;
+    --color-primary-light: #54adff;
+    --color-primary-dark: #409EFF;
+    --color-white: #fff;
+
+    --border-color     : #cacaca;
+    --border-color-light: #d6d6d6;
+    --border-color-dark: #c1c1c1;
+    --border-radius-input: 14px;
+
+    --bg-color           : #fafafa;
+    --bg-color-node-title: #f1f1f1;
+
+    --scrollbar-color-thumb: #cacaca;
+
+    --text-color-primary  : #1b1b1b;
+    --text-color-secondary: #545454;
+    --text-color-tertiary : #878787;
+
+    --font-size-xx-small  : 1.1rem;
+    --font-size-x-small  : 1.2rem;
+    --font-size-small  : 1.3rem;
+    --font-size-base  : 1.4rem;
+    --font-size-medium: 1.6rem;
+
+    --container-padding: 16px;
+
+    --caret-color: #606266;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+}
+
+*,
+:after,
+:before {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+html,
+body,
+#app {
+    height: 100%;
+}
+
+body {
+    background-color: var(--bg-color);
+    font-family     : "Roboto", sans-serif;
+    font-size       : var(--font-size-medium);
+    color           : var(--text-color-primary);
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}

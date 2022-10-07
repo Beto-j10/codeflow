@@ -123,6 +123,18 @@ export default {
                 },
                 class: "IfStatement",
             },
+            {
+                name: "Var",
+                color: "#49433440",
+                item: "Var",
+                input: 0,
+                output: 1,
+                data: {
+                    num: 0,
+                    idParent: 0,
+                },
+                class: "Identifier ops",
+            },
         ]);
         let isModulesBar = ref(true)
         const varsState = reactive(store.stateVars.vars)
@@ -178,7 +190,7 @@ export default {
             importProgram(editor.value);
         }
 
-        function printLogs(){
+        function printLogs() {
             store.printStates("vars")
             store.printStates("modules")
             store.printStates("connections")
@@ -198,6 +210,8 @@ export default {
             editor.value.registerNode("Num", Number, {}, {});
             editor.value.registerNode("Block", NodeBlock, {}, {});
             editor.value.registerNode("If", NodeIf, {}, {});
+            editor.value.registerNode("Var", NodeVar, {}, {});
+
 
             editor.value.on("nodeRemoved", (id) => {
                 stopWatch(id);
@@ -222,12 +236,14 @@ export default {
             });
 
         });
+
+        //TODO: change initial to full word
         watch(varsState, () => {
             varsState.forEach(element => {
                 if (element.name.startsWith("F")) {
                     editor.value.registerNode(element.name, NodeVarFor, {}, {});
 
-                } else if (element.name.startsWith("A")) {
+                } else if (element.name.startsWith("V")) {
                     editor.value.registerNode(element.name, NodeVar, {}, {});
                 }
             });

@@ -31,7 +31,7 @@ export default defineComponent({
                 store.initializeInputValues(nodeId.value, 0)
             }
             const sharedState = reactive(store.stateConnections[nodeId.value])
-            varName.value = `Assign${nodeId.value}`
+            varName.value = `Var${nodeId.value}`
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
                 store.addVar(nodeId.value, varName.value)

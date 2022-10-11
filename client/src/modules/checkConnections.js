@@ -37,10 +37,11 @@ export function checkAllConnectedInputs(nodeID, editor) {
     const inputs = nodeData.inputs
     for (const input of Object.keys(inputs)) {
         if (!inputs[input].connections.at(0)) {
-            return
+            return false
         }
     }
     store.updateRun(nodeID, true)
+    return true
 }
 
 export function checkAllConnectedOutputs(nodeID, editor) {

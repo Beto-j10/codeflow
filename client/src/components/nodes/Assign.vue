@@ -34,14 +34,15 @@ export default defineComponent({
             varName.value = `Var${nodeId.value}`
             if (!checkMounted(nodeId.value)) {
                 registerMounted(nodeId.value)
-                store.addVar(nodeId.value, varName.value)
 
                 const stop = watch(sharedState, () => {
                     console.log("sharedState Assign: ", sharedState)
                     if (sharedState[0].run) {
+                        store.addVar(nodeId.value, varName.value, sharedState[1].input_1)
                         nodeData.data.num = sharedState[1].input_1
                     } else {
                         nodeData.data.num = 0
+                        store.removeVar(nodeId.value)
                     }
                     df.updateNodeDataFromId(nodeId.value, nodeData.data);
                     num.value = nodeData.data.num;

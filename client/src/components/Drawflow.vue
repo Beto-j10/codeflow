@@ -123,6 +123,8 @@ export default {
                 },
                 class: "IfStatement",
             },
+        ]);
+        const varNode = readonly(
             {
                 name: "Var",
                 color: "#49433440",
@@ -135,10 +137,11 @@ export default {
                 },
                 class: "Identifier ops",
             },
-        ]);
+        )
         let isModulesBar = ref(true)
-        const varsState = reactive(store.stateVars.vars)
         const modulesState = reactive(store.stateModules.modules)
+        const varsState = reactive(store.stateVars)
+        const isVarsState = ref(false)
         const editor = shallowRef({});
         const dialogVisible = ref(false);
         const dialogData = ref({});
@@ -167,10 +170,12 @@ export default {
             pos_y = pos_y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)) - (editor.value.precanvas.getBoundingClientRect().y * (editor.value.precanvas.clientHeight / (editor.value.precanvas.clientHeight * editor.value.zoom)));
             let nodeSelected = {};
             if (nodeVar === "var") {
-                nodeSelected = varsState.find(ele => ele.item == name);
-                console.log("||||||||||||||||||||||||||")
+                nodeSelected = varNode;
+                console.log("||||||||||||||||||||||||||", nodeSelected)
             } else {
                 nodeSelected = listNodes.find(ele => ele.item == name);
+                console.log("¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", nodeSelected)
+
             }
             editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, nodeSelected.class, nodeSelected.data, name, "vue");
         };
@@ -194,6 +199,7 @@ export default {
             store.printStates("vars")
             store.printStates("modules")
             store.printStates("connections")
+            console.log("isVarsState: ", isVarsState.value)
         }
 
         onMounted(async () => {
@@ -238,25 +244,29 @@ export default {
         });
 
         //TODO: change initial to full word
+        //TODO: delete deprecated feature
         watch(varsState, () => {
-            varsState.forEach(element => {
-                if (element.name.startsWith("F")) {
-                    editor.value.registerNode(element.name, NodeVarFor, {}, {});
+            isVarsState.value = Object.keys(varsState).length > 0 ? true : false
+            //     varsState.forEach(element => {
+            //         if (element.name.startsWith("F")) {
+            //             editor.value.registerNode(element.name, NodeVarFor, {}, {});
 
-                } else if (element.name.startsWith("V")) {
-                    editor.value.registerNode(element.name, NodeVar, {}, {});
-                }
-            });
+            //         } else if (element.name.startsWith("V")) {
+            //             editor.value.registerNode(element.name, NodeVar, {}, {});
+            //         }
+            //     });
         });
         return {
             exportEditor,
             listNodes,
+            varNode,
             drag,
             drop,
             allowDrop,
             dialogVisible,
             dialogData,
             varsState,
+            isVarsState,
             modulesState,
             handleClickItem,
             isModulesBar,
@@ -281,7 +291,7 @@ export default {
 
         <template #sidebar>
             <ul class="list">
-                <details class="list__item list__item--pointer">
+                <!-- <details class="list__item list__item--pointer">
                     <summary>Variables</summary>
                     <ul class="vars">
                         <li class="vars__item" v-for="v in varsState" :key="v.data.idParent" draggable="true"
@@ -289,8 +299,12 @@ export default {
                             <div class="list__node">{{ v.name }}</div>
                         </li>
                     </ul>
-                </details>
-                <li class="list__item" v-for="n in listNodes" :key="n" draggable="true" :data-node="n.item"
+                </details> -->
+                <li class="list__item" :class="[isVarsState ? '' :'list__item--disabled']" :draggable=isVarsState
+                    :data-node="varNode.item" @dragstart="drag($event, 'var')">
+                    <div class="list__node">{{ varNode.name }}</div>
+                </li>
+                <li class=" list__item" v-for="n in listNodes" :key="n" draggable="true" :data-node="n.item"
                     @dragstart="drag($event)">
                     <!-- <div class="list__node" :style="`background: ${n.color}`">{{ n.name }}</div> -->
                     <div class="list__node">{{ n.name }}</div>
@@ -344,6 +358,7 @@ export default {
     padding: 0;
     margin: 0;
     border-right: 1px solid var(--border-color-dark);
+    caret-color: transparent;
 }
 
 .list__item {
@@ -354,6 +369,11 @@ export default {
 
 .list__item--pointer {
     cursor: pointer;
+}
+
+.list__item--disabled {
+    color: var(--text-color-disabled);
+    cursor: not-allowed;
 }
 
 .vars {

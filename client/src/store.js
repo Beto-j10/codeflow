@@ -12,7 +12,7 @@ const store = {
     }),
 
     stateVars: reactive({
-        vars: [],
+
     }),
 
     stateModules: reactive({
@@ -22,7 +22,7 @@ const store = {
     printStates(typeState) {
         switch (typeState) {
             case "vars":
-                console.warn("PrintStates stateVars: ", this.stateVars.vars)
+                console.warn("PrintStates stateVars: ", this.stateVars)
                 break;
             case "modules":
                 console.warn("PrintStates stateModules: ", this.stateModules.modules)
@@ -87,23 +87,32 @@ const store = {
         checkAllConnectedInputs(ids.input_id, editor)
     },
 
-    addVar(id, name) {
-        this.stateVars.vars.push({
+    addVar(id, name, value) {
+        // this.stateVars.vars.push({
+        //     name: name,
+        //     color: "#49433440",
+        //     item: name,
+        //     input: 0,
+        //     output: 1,
+        //     data: {
+        //         num: 0,
+        //         idParent: id,
+        //     },
+        //     class: "Identifier ops",
+        // })
+        this.stateVars[id] = {
+            num: value,
             name: name,
-            color: "#49433440",
-            item: name,
-            input: 0,
-            output: 1,
-            data: {
-                num: 0,
-                idParent: id,
-            },
-            class: "Identifier ops",
-        })
+            idParent: id
+        }
     },
 
-    removeVar(varIndex) {
-        this.stateVars.vars.splice(varIndex, 1)
+    changeVarValue(id, value) {
+        this.stateVars[id].num = value
+    },
+
+    removeVar(id) {
+        delete this.stateVars[id]
     },
 
     addModule(name, id, df) {
@@ -147,23 +156,23 @@ const store = {
     },
 
     deleteState(id, editor) {
-        const varIndex = this.stateVars.vars.findIndex(({ data }) => data.idParent === id)
+        const hasVar = Object.hasOwn(this.stateVars, id)
         const moduleIndex = this.stateModules.modules.findIndex((module) => module.id === id)
 
         // not a var and not a module
-        if (varIndex === -1 && moduleIndex === -1) {
+        if (hasVar === false && moduleIndex === -1) {
             return
         }
 
         // is a var
-        if (varIndex !== -1 && moduleIndex === -1) {
-            this.removeVar(varIndex)
+        if (hasVar !== false && moduleIndex === -1) {
+            this.removeVar(id)
             return
         }
 
         // is module For
-        if (varIndex !== -1 && moduleIndex !== -1) {
-            this.removeVar(varIndex)
+        if (hasVar !== false && moduleIndex !== -1) {
+            this.removeVar(id)
             this.removeModule(moduleIndex, editor)
             return
 

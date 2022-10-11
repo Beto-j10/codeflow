@@ -24,7 +24,7 @@ export default defineComponent({
 
         onMounted(async () => {
 
-
+            //TODO: finish implementation
             await nextTick()
             nodeId.value = el.value.parentElement.parentElement.id.slice(5)
             nodeData.value = df.getNodeFromId(nodeId.value)

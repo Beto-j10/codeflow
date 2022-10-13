@@ -2,7 +2,6 @@ import { reactive } from 'vue';
 import { checkAllConnectedInputs, CheckClassOps } from './modules/checkConnections';
 
 const store = {
-
     stateGeneralVars: reactive({
         isImport: false,
     }),
@@ -12,7 +11,6 @@ const store = {
     }),
 
     stateVars: reactive({
-
     }),
 
     stateModules: reactive({
@@ -88,18 +86,6 @@ const store = {
     },
 
     addVar(id, name, value) {
-        // this.stateVars.vars.push({
-        //     name: name,
-        //     color: "#49433440",
-        //     item: name,
-        //     input: 0,
-        //     output: 1,
-        //     data: {
-        //         num: 0,
-        //         idParent: id,
-        //     },
-        //     class: "Identifier ops",
-        // })
         this.stateVars[id] = {
             num: value,
             name: name,

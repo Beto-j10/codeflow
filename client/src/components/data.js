@@ -151,156 +151,229 @@ export const data2 = {
 
 export const data3 = {
     "drawflow": {
-        "Home": {
+      "Home": {
+        "data": {
+          "1": {
+            "id": 1,
+            "name": "Num",
             "data": {
-                "3": {
-                    "id": 3,
-                    "name": "Num",
-                    "data": {
-                        "num": 1
-                    },
-                    "class": "NumericLiteral",
-                    "html": "Num",
-                    "typenode": "vue",
-                    "inputs": {},
-                    "outputs": {
-                        "output_1": {
-                            "connections": [
-                                {
-                                    "node": "7",
-                                    "output": "input_1"
-                                }
-                            ]
-                        }
-                    },
-                    "pos_x": 17,
-                    "pos_y": 78
-                },
-                "4": {
-                    "id": 4,
-                    "name": "Num",
-                    "data": {
-                        "num": 2
-                    },
-                    "class": "NumericLiteral",
-                    "html": "Num",
-                    "typenode": "vue",
-                    "inputs": {},
-                    "outputs": {
-                        "output_1": {
-                            "connections": [
-                                {
-                                    "node": "7",
-                                    "output": "input_2"
-                                }
-                            ]
-                        }
-                    },
-                    "pos_x": 18,
-                    "pos_y": 203
-                },
-                "7": {
-                    "id": 7,
-                    "name": "If",
-                    "data": {
-                        "operator": "=="
-                    },
-                    "class": "IfStatement",
-                    "html": "If",
-                    "typenode": "vue",
-                    "inputs": {
-                        "input_1": {
-                            "connections": [
-                                {
-                                    "node": "3",
-                                    "input": "output_1"
-                                }
-                            ]
-                        },
-                        "input_2": {
-                            "connections": [
-                                {
-                                    "node": "4",
-                                    "input": "output_1"
-                                }
-                            ]
-                        }
-                    },
-                    "outputs": {},
-                    "pos_x": 224,
-                    "pos_y": 113
-                }
-            }
-        },
-        "If7": {
+              "num": 8
+            },
+            "class": "NumericLiteral",
+            "html": "Num",
+            "typenode": "vue",
+            "inputs": {},
+            "outputs": {
+              "output_1": {
+                "connections": [
+                  {
+                    "node": "3",
+                    "output": "input_1"
+                  },
+                  {
+                    "node": "3",
+                    "output": "input_2"
+                  }
+                ]
+              }
+            },
+            "pos_x": 43,
+            "pos_y": 84
+          },
+          "2": {
+            "id": 2,
+            "name": "If",
             "data": {
-                "8": {
-                    "id": 8,
-                    "name": "Num",
-                    "data": {
-                        "num": 9
-                    },
-                    "class": "NumericLiteral",
-                    "html": "Num",
-                    "typenode": "vue",
-                    "inputs": {},
-                    "outputs": {
-                        "output_1": {
-                            "connections": [
-                                {
-                                    "node": "9",
-                                    "output": "input_1"
-                                },
-                                {
-                                    "node": "9",
-                                    "output": "input_2"
-                                }
-                            ]
-                        }
-                    },
-                    "pos_x": 9,
-                    "pos_y": 177
-                },
-                "9": {
-                    "id": 9,
-                    "name": "Add",
-                    "data": {
-                        "num": 18,
-                        "operator": "+"
-                    },
-                    "class": "BinaryExpression Addition ops",
-                    "html": "Add",
-                    "typenode": "vue",
-                    "inputs": {
-                        "input_1": {
-                            "connections": [
-                                {
-                                    "node": "8",
-                                    "input": "output_1"
-                                }
-                            ]
-                        },
-                        "input_2": {
-                            "connections": [
-                                {
-                                    "node": "8",
-                                    "input": "output_1"
-                                }
-                            ]
-                        }
-                    },
-                    "outputs": {
-                        "output_1": {
-                            "connections": []
-                        }
-                    },
-                    "pos_x": 207,
-                    "pos_y": 150
-                }
-            }
+              "operator": "=="
+            },
+            "class": "IfStatement",
+            "html": "If",
+            "typenode": "vue",
+            "inputs": {
+              "input_1": {
+                "connections": [
+                  {
+                    "node": "4",
+                    "input": "output_1"
+                  }
+                ]
+              },
+              "input_2": {
+                "connections": [
+                  {
+                    "node": "4",
+                    "input": "output_1"
+                  }
+                ]
+              }
+            },
+            "outputs": {},
+            "pos_x": 208,
+            "pos_y": 269
+          },
+          "3": {
+            "id": 3,
+            "name": "Add",
+            "data": {
+              "num": 16,
+              "operator": "+"
+            },
+            "class": "BinaryExpression Addition ops",
+            "html": "Add",
+            "typenode": "vue",
+            "inputs": {
+              "input_1": {
+                "connections": [
+                  {
+                    "node": "1",
+                    "input": "output_1"
+                  }
+                ]
+              },
+              "input_2": {
+                "connections": [
+                  {
+                    "node": "1",
+                    "input": "output_1"
+                  }
+                ]
+              }
+            },
+            "outputs": {
+              "output_1": {
+                "connections": []
+              }
+            },
+            "pos_x": 263,
+            "pos_y": 91
+          },
+          "4": {
+            "id": 4,
+            "name": "Num",
+            "data": {
+              "num": 0
+            },
+            "class": "NumericLiteral",
+            "html": "Num",
+            "typenode": "vue",
+            "inputs": {},
+            "outputs": {
+              "output_1": {
+                "connections": [
+                  {
+                    "node": "2",
+                    "output": "input_1"
+                  },
+                  {
+                    "node": "2",
+                    "output": "input_2"
+                  }
+                ]
+              }
+            },
+            "pos_x": 25,
+            "pos_y": 258
+          }
         }
+      },
+      "If2": {
+        "data": {
+          "5": {
+            "id": 5,
+            "name": "Num",
+            "data": {
+              "num": 22
+            },
+            "class": "NumericLiteral",
+            "html": "Num",
+            "typenode": "vue",
+            "inputs": {},
+            "outputs": {
+              "output_1": {
+                "connections": [
+                  {
+                    "node": "6",
+                    "output": "input_1"
+                  },
+                  {
+                    "node": "6",
+                    "output": "input_2"
+                  }
+                ]
+              }
+            },
+            "pos_x": 63,
+            "pos_y": 85
+          },
+          "6": {
+            "id": 6,
+            "name": "Add",
+            "data": {
+              "num": 44,
+              "operator": "+"
+            },
+            "class": "BinaryExpression Addition ops",
+            "html": "Add",
+            "typenode": "vue",
+            "inputs": {
+              "input_1": {
+                "connections": [
+                  {
+                    "node": "5",
+                    "input": "output_1"
+                  }
+                ]
+              },
+              "input_2": {
+                "connections": [
+                  {
+                    "node": "5",
+                    "input": "output_1"
+                  }
+                ]
+              }
+            },
+            "outputs": {
+              "output_1": {
+                "connections": [
+                  {
+                    "node": "7",
+                    "output": "input_1"
+                  }
+                ]
+              }
+            },
+            "pos_x": 277,
+            "pos_y": 104
+          },
+          "7": {
+            "id": 7,
+            "name": "Assign",
+            "data": {
+              "num": 44,
+              "var": "Var7"
+            },
+            "class": "VariableDeclarator Assign ops",
+            "html": "Assign",
+            "typenode": "vue",
+            "inputs": {
+              "input_1": {
+                "connections": [
+                  {
+                    "node": "6",
+                    "input": "output_1"
+                  }
+                ]
+              }
+            },
+            "outputs": {},
+            "pos_x": 486,
+            "pos_y": 121
+          }
+        }
+      }
     }
-}
+  }
 
 export const data4 = {
     "drawflow": {

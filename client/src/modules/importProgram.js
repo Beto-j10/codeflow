@@ -18,7 +18,7 @@ export function importProgram(editor) {
     // });
     //TODO: delete setIsImport. This doesn't allow to create new modules
     store.setIsImport(true)
-    editor.import(data4)
+    editor.import(data3)
 
     // editor.changeModule('If7')
 }

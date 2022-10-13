@@ -21,7 +21,8 @@ import { CheckClassOps, checkConnected, checkConnections, checkNodeRemoved } fro
 import { stopWatch } from '../helpers/stopWatch'
 import { transformToAST } from '../modules/transformToAST'
 import BaseLayout from './layouts/BaseLayout.vue'
-import { unregisterMounted } from '../helpers/mountedNodes'
+import { unregisterMounted, debugMountedNodes } from '../helpers/mountedNodes'
+import { debugStartNumberNodes, hasNumberNodes, startNumberNode } from '../helpers/startNumberNodes'
 import { data1, data2 } from './data'
 import { importProgram } from '../modules/importProgram'
 
@@ -171,35 +172,46 @@ export default {
             let nodeSelected = {};
             if (nodeVar === "var") {
                 nodeSelected = varNode;
-                console.log("||||||||||||||||||||||||||", nodeSelected)
             } else {
                 nodeSelected = listNodes.find(ele => ele.item == name);
-                console.log("¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", nodeSelected)
 
             }
             editor.value.addNode(name, nodeSelected.input, nodeSelected.output, pos_x, pos_y, nodeSelected.class, nodeSelected.data, name, "vue");
         };
-        function handleClickItem(event, module) {
+        async function handleClickItem(event, module) {
             editor.value.changeModule(module);
             const e = document.querySelectorAll(".modules__item");
             e.forEach(element => {
                 element.classList.remove("modules__item--selected");
             });
             event.target.classList.add("modules__item--selected");
+            await nextTick()
+            if (hasNumberNodes()) {
+                startNumberNode(editor.value)
+            }
         }
+
         function toggleModulesBar() {
             isModulesBar.value = !isModulesBar.value;
         }
 
-        function importEditor() {
-            importProgram(editor.value);
+        async function importEditor() {
+            await importProgram(editor.value);
+
+            await nextTick()
+            debugStartNumberNodes()
+            if (hasNumberNodes()) {
+                startNumberNode(editor.value)
+            }
         }
 
         function printLogs() {
             store.printStates("vars")
             store.printStates("modules")
             store.printStates("connections")
-            console.log("isVarsState: ", isVarsState.value)
+            console.log("isVarsState: ", varsState.isVarsState)
+            debugMountedNodes()
+            debugStartNumberNodes()
         }
 
         onMounted(async () => {

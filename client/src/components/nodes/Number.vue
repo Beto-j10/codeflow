@@ -1,16 +1,19 @@
 <script>
-import { defineComponent, ref, onMounted, getCurrentInstance, nextTick } from 'vue';
+import { defineComponent, ref, onMounted, getCurrentInstance, nextTick, watch, reactive } from 'vue';
 import store from '../../store';
+import { registerStop } from '../../helpers/stopWatch';
 import Node from '../layouts/Node.vue';
 import moveTitle from '../../helpers/moveTitle';
 import Input from '../Input.vue';
+import { checkMounted, registerMounted } from '../../helpers/mountedNodes'
 import { checkAllConnectedOutputs } from '../../modules/checkConnections';
+import { registerNumberNode } from '../../helpers/startNumberNodes'
 
 export default defineComponent({
     components: {
-    Node,
-    Input
-},
+        Node,
+        Input
+    },
     data() {
         return {
             sharedState: store.state
@@ -40,6 +43,10 @@ export default defineComponent({
             num.value = nodeData.value.data.num;
 
             moveTitle(nodeId.value)
+            if (!checkMounted(nodeId.value)) {
+                registerMounted(nodeId.value)
+                registerNumberNode(nodeId.value)
+            }
         });
 
         return {
@@ -54,13 +61,13 @@ export default defineComponent({
 <template>
     <div ref="el">
         <Node node-title="Number">
-            <Input v-model.number="num" @change="handleChange"/>
+            <Input v-model.number="num" @change="handleChange" />
         </Node>
     </div>
 </template>
 
 <style>
-    #drawflow .NumericLiteral .output::before {
-        content: "Number";
-    }
+#drawflow .NumericLiteral .output::before {
+    content: "Number";
+}
 </style>

@@ -6,6 +6,7 @@ import Node from '../layouts/Node.vue';
 import moveTitle from '../../helpers/moveTitle';
 import Input from '../Input.vue';
 import { checkMounted, registerMounted } from '../../helpers/mountedNodes';
+import { checkAllConnectedInputs } from '../../modules/checkConnections'
 
 export default defineComponent({
     components: {
@@ -20,9 +21,6 @@ export default defineComponent({
         let df = null
         let nodeData = {};
         df = getCurrentInstance().appContext.config.globalProperties.$df.value;
-
-        //TODO: fix reactivity chain
-        // check if the value of its input changed
 
         onMounted(async () => {
             await nextTick()
@@ -61,7 +59,6 @@ export default defineComponent({
 
         return {
             el,
-            // num,
             varName,
         }
     },

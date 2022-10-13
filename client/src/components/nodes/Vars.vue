@@ -99,7 +99,7 @@ export default defineComponent({
 <template>
     <div ref="el">
         <!-- <Node node-title="Var" isEmpty> -->
-        <Node node-title="Var">
+        <Node node-title="Var" width="110px">
             <el-select v-model="selected" class="m-2" placeholder="Select" size="small" @change="handleChange">
                 <el-option v-for="item in sharedState" :key="item.name" :label="item.name" :value="item.idParent" />
             </el-select>

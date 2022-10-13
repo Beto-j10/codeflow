@@ -1,5 +1,9 @@
 const mountedNodes = [];
 
+export function debugMountedNodes() {
+    console.warn("Print mountedNodes: ", mountedNodes)
+}
+
 export function checkMounted(nodeId) {
     return mountedNodes.includes(nodeId);
 }
